@@ -1,0 +1,39 @@
+&basic
+     ntypes = 1
+     natoms = 2
+      nsize = 6 6 1
+/
+
+&inputph
+   elements = "P"
+        nat = 2
+   gen2ndfc = .true.
+        dos = .false.
+       band = .true.
+   velocity = .false.
+eigenvector = .false.
+fc_symmetry = .false.
+nonanalytic = .false.
+ isosurface = .false.
+sqw_crystal = .false.
+ sqw_powder = .false.
+/
+
+Displace_DELTA
+0.01
+
+BANDS_STRUCTURE
+3
+0.000 0.000 0.000  0.500 0.000 0.000 100
+0.500 0.000 0.000  0.333 0.333 0.000 100
+0.333 0.333 0.000  0.000 0.000 0.000 100
+
+LATTICE_PARAMETERS
+ 3.2792251494973850  0.0000000000000000  0.0000000000000000
+-1.6396125747053298  2.8398922842051841  0.0000000000000000
+ 0.0000000000000000  0.0000000000000000 20.0000000000000000
+
+ATOMIC_POSITIONS
+Direct
+0.6666666666667  0.333333666667  0.4608487558750104
+0.3333333333333  0.666666333333  0.3989712291249911
