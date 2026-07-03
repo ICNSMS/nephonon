@@ -62,7 +62,7 @@ $$
   - `Cartesian`: Cartesian coordinates in Angstrom.
 - Internally, the dynamical-matrix solver returns angular frequencies in THz; most outputs are written as energies in meV.
 - Q-points in `BANDS_STRUCTURE` are given as fractional coordinates in the reciprocal basis derived from `LATTICE_PARAMETERS`.
-- The x‑axis of the `sqw_powder.dat` file is given in **\AA^{-1}** (inverse Angstrom), i.e., absolute reciprocal‑space units.
+- The x‑axis of the `sqw_powder.dat` file is given in **$\AA^{-1}$** (inverse Angstrom), i.e., absolute reciprocal‑space units.
 
 ## Installation
 
