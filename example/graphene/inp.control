@@ -1,0 +1,39 @@
+&basic
+     ntypes = 1
+     natoms = 2
+      nsize = 5 5 1
+/
+
+&inputph
+   elements = "C"
+        nat = 2
+   gen2ndfc = .false.
+        dos = .false.
+       band = .true.
+   velocity = .false.
+eigenvector = .false.
+fc_symmetry = .false.
+nonanalytic = .false.
+ isosurface = .true.
+sqw_crystal = .false.
+ sqw_powder = .false.
+/
+
+ISOSURFACE
+50 50 1
+
+BANDS_STRUCTURE
+3
+0.0000000000 0.0000000000 0.0000000000 0.5000000000 0.5000000000 0.0000000000 200
+0.5000000000 0.5000000000 0.0000000000 0.3333333333 0.6666666667 0.0000000000 250
+0.3333333333 0.6666666667 0.0000000000 0.0000000000 0.0000000000 0.0000000000 150
+
+LATTICE_PARAMETERS
+2.4600000381  0.0000000000  0.0000000000
+1.2300000191  2.1304225263  0.0000000000
+0.0000000000  0.0000000000 10.0000000000
+
+ATOMIC_POSITIONS
+Direct
+0.0000000000 0.0000000000 0.5000000000
+0.3333333333 0.3333333333 0.5000000000
