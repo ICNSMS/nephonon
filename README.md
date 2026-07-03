@@ -34,7 +34,7 @@ $$
 $$
 
 $$
-g(\omega) = \frac{1}{2}
+g(\omega) = \frac{1}{N_q}
 $$
 
 $$
