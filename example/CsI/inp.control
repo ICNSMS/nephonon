@@ -1,0 +1,44 @@
+&basic
+     ntypes = 2 
+     natoms = 2
+      nsize = 2 2 2
+/
+
+&inputph
+   elements = "Cs" "I"
+        nat = 1 1
+   gen2ndfc = .false.
+        dos = .false.
+       band = .false.
+   velocity = .false.
+eigenvector = .false.
+fc_symmetry = .false.
+nonanalytic = .false.
+ isosurface = .false.
+sqw_crystal = .true.
+ sqw_powder = .false.
+/
+
+&inputsqw
+     lphase = .false. 
+   dw_qmesh = 10 10 10
+temperature = 300  
+      e_min = 0.0
+      e_max = 12.0
+    ne_bins = 400
+ e_smearing = 2.0 0.0 0.001 0.0 0.0
+/
+
+BANDS_STRUCTURE
+1
+0.0 0.0 0.0 4.0 0.0 0.0 400
+
+LATTICE_PARAMETERS
+4.5199999809 0.0000000000 0.0000000000
+0.0000000000 4.5199999809 0.0000000000
+0.0000000000 0.0000000000 4.5199999809
+
+ATOMIC_POSITIONS
+Direct
+0.0000000000 0.0000000000 0.0000000000
+0.5000000000 0.5000000000 0.5000000000
