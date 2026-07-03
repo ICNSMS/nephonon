@@ -1,4 +1,9 @@
-1. Detailed structures of Phosphorene
-There are three examples for α-phosphorene, β-phosphorene, and twisted α-phosphorene.
-α- and β-phosphorene mean monolayer black and blue phosphorus allotropes, respectively [PRL 113, 046804 (2014)].
-Twisted α-phosphorene is the moiré bilayer case of α-phosphorene.
+## Detailed Structures of Phosphorene
+
+Three representative examples are included:
+
+- **α‑phosphorene** – monolayer black phosphorus allotrope  
+- **β‑phosphorene** – monolayer blue phosphorus allotrope  
+- **Twisted α‑phosphorene** – moiré bilayer structure built from two α‑phosphorene layers
+
+For the distinction between α‑ and β‑phosphorene allotropes, see [PRL **113**, 046804 (2014)](https://doi.org/10.1103/PhysRevLett.113.046804).
