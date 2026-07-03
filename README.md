@@ -22,9 +22,9 @@
 ### 1. Dynamical Matrix
 The dynamical matrix $D_{\alpha\beta}(\kappa\kappa'|\mathbf{q})$ is calculated as:
 
-$
+$$
 D_{\alpha\beta}(\kappa\kappa'|\mathbf{q}) = \frac{1}{\sqrt{M_\kappa M_{\kappa'}}} \sum_{l'} \Phi_{\alpha\beta}(0\kappa, l'\kappa') e^{i\mathbf{q}\cdot(\mathbf{r}_{l'\kappa'} - \mathbf{r}_{0\kappa})}
-$
+$$
 
 where $\Phi$ are the force constants, $M$ are atomic masses, and $\mathbf{r}$ are atomic positions.
 
@@ -39,13 +39,17 @@ where $\sigma$ is the smearing width (`DOS_SIGMA`).
 
 ### 3. Neutron Scattering Intensity $S(\mathbf{Q},\omega)$
 The coherent one-phonon dynamic structure factor is calculated as:
+
 $$
 S(\mathbf{Q},\omega) \propto \sum_j \frac{n(\omega_{\mathbf{Q}j}) + 1}{\omega_{\mathbf{Q}j}} \left| F_j(\mathbf{Q}) \right|^2 \delta(E - \hbar\omega_{\mathbf{Q}j})
 $$
+
 where the dynamic structure factor $F_j(\mathbf{Q})$ is:
+
 $$
 F_j(\mathbf{Q}) = \sum_\kappa \frac{b_\kappa}{\sqrt{M_\kappa}} e^{-W_\kappa} (\mathbf{Q} \cdot \mathbf{e}_{\kappa,j}) e^{i\mathbf{Q}\cdot\mathbf{d}_\kappa}
 $$
+
 - $n(\omega)$: Bose-Einstein distribution factor.
 - $b_\kappa$: Coherent neutron scattering length of atom $\kappa$.
 - $W_\kappa$: Debye-Waller factor, $W_\kappa = \frac{1}{2} \langle (\mathbf{Q} \cdot \mathbf{u}_\kappa)^2 \rangle$.
