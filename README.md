@@ -34,11 +34,7 @@ $$
 $$
 
 $$
-g(\omega) = \frac{1}{N_q}
-$$
-
-$$
-\sum_{\mathbf{q},j}\frac{1}{\sqrt{\pi}\sigma}\exp[-(\frac{\omega - \omega_{\mathbf{q}j}}{\sigma})^2]
+g(\omega) = \frac{1}{N_q}\sum_{\mathbf{q},j}\frac{1}{\sqrt{\pi}\sigma}\exp[-(\frac{\omega - \omega_{\mathbf{q}j}}{\sigma})^2]
 $$
 
 where $\sigma$ is the smearing width (`DOS_SIGMA`).
