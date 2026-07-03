@@ -29,7 +29,7 @@ where $\Phi$ are the force constants, $M$ are atomic masses, and $\mathbf{r}$ ar
 ### 2. Phonon Density of States (DOS)
 The phonon DOS $g(\omega)$ is calculated using Gaussian smearing:
 $$
-g(\omega) = \frac{1}{N_q} \sum_{\mathbf{q},j} \frac{1}{\sqrt{\pi}\sigma} \exp\left[-\left(\frac{\omega - \omega_{\mathbf{q}j}}{\sigma}\right)^2\right]
+g(\omega) = \frac{1}{N_q}\sum_{\mathbf{q},j}\frac{1}{\sqrt{\pi}\sigma}\exp[-(\frac{\omega - \omega_{\mathbf{q}j}}{\sigma})^2]
 $$
 where $\sigma$ is the smearing width (`DOS_SIGMA`).
 
