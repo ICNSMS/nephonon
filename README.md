@@ -1,6 +1,6 @@
 # nephonon
 
-**nephonon** is a Fortran-based software package designed for calculating phonon properties and neutron scattering intensities. It supports force constants generated either from Phonopy (via `FORCE_CONSTANTS` file) or directly from Neuroevolution Potentials (NEPs) using an integrated interface.
+**nephonon** is a Fortran-based software package designed for calculating phonon properties and neutron scattering intensities. It supports force constants entered from Phonopy (via `FORCE_CONSTANTS` file) or directly generated from [Neuroevolution Potentials (NEPs)](https://github.com/brucefan1983/NEP_CPU) using an integrated interface.
 
 ## Features
 
