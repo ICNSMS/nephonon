@@ -1,0 +1,46 @@
+&basic
+     ntypes = 1
+     natoms = 1
+      nsize = 4 4 4
+/
+
+&inputph
+   elements = "Cu"
+        nat = 1
+   gen2ndfc = .true.
+        dos = .false.
+       band = .false.
+   velocity = .false.
+eigenvector = .false.
+fc_symmetry = .true.
+nonanalytic = .false.
+ isosurface = .false.
+sqw_crystal = .true.
+ sqw_powder = .false.
+/
+
+&inputsqw
+     lphase = .true. 
+   dw_qmesh = 10 10 10
+temperature = 30  
+      e_min = 0.0
+      e_max = 40.0
+    ne_bins = 501
+ e_smearing = 5.0 0.0 0.001 0.0 0.0
+/
+
+Displace_DELTA
+0.01
+
+BANDS_STRUCTURE
+1
+1.0 0.0 0.0  1.0 2.5 2.5 500
+
+LATTICE_PARAMETERS
+0.0000000000000000 2.0285682794499998 2.0285682794499998
+2.0285682794499998 0.0000000000000000 2.0285682794499998
+2.0285682794499998 2.0285682794499998 0.0000000000000000
+
+ATOMIC_POSITIONS
+Direct
+0.00 0.00 0.00
