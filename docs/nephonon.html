@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nephonon · Input Generator (Narrow)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #2d2d30;
+            margin: 0;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 650px;
+            max-width: 100%;
+            background: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .header {
+            background: #e0e0e0;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #c0c0c0;
+        }
+        .logo-area {
+            width: 40px;
+            height: 40px;
+            background: #8b5a2b;
+            border-radius: 50%;
+            animation: rotateLogo 12s infinite linear;
+        }
+        @keyframes rotateLogo {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .title-box h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #5a3e1b;
+        }
+        .title-box p {
+            margin: 2px 0 0;
+            color: #2d2d30;
+            font-size: 11px;
+        }
+        .separator {
+            height: 2px;
+            background: #ccc;
+            margin: 0 8px 4px;
+        }
+        .main-scroll {
+            overflow-y: auto;
+            max-height: 80vh;
+            padding: 8px 12px;
+            background: #f5f5f5;
+        }
+        .tabs {
+            display: flex;
+            gap: 2px;
+            background: #d0d0d0;
+            padding: 6px 6px 0 6px;
+            border-radius: 6px 6px 0 0;
+        }
+        .tab-btn {
+            background: #c0c0c0;
+            border: none;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e1e1e;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            transition: 0.15s;
+            border-bottom: 2px solid transparent;
+            flex: 1;
+        }
+        .tab-btn.active {
+            background: #f5f5f5;
+            border-bottom: 2px solid #8b5a2b;
+            color: #5a3e1b;
+        }
+        .tab-pane {
+            display: none;
+            background: #f5f5f5;
+            padding: 12px 8px;
+            border-radius: 0 0 6px 6px;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        .section {
+            background: #e8e8e8;
+            border: 1px solid #d0d0d0;
+            border-radius: 5px;
+            margin-bottom: 16px;
+            padding: 10px 12px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2b2b2b;
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-left: 4px solid #8b5a2b;
+            padding-left: 8px;
+        }
+        .collapsible {
+            background: #dadada;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 1px solid #b0b0b0;
+        }
+        .collapsible-header {
+            padding: 6px 10px;
+            background: #cecece;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+            font-size: 13px;
+        }
+        .collapsible-header .arrow {
+            font-size: 13px;
+            transition: transform 0.2s;
+            color: #8b5a2b;
+        }
+        .collapsible-content {
+            display: none;
+            padding: 10px;
+            background: #e6e6e6;
+            border-top: 1px solid #b0b0b0;
+        }
+        .collapsible.expanded .collapsible-content {
+            display: block;
+        }
+        .collapsible.expanded .arrow {
+            transform: rotate(90deg);
+        }
+        .param-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 3px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+        .param-label {
+            font-weight: 500;
+            color: #2d2d30;
+            min-width: 110px;
+            font-size: 13px;
+        }
+        .param-input {
+            flex: 1;
+        }
+        .param-input input[type="number"] {
+            width: 90px;
+            padding: 4px 6px;
+            font-size: 13px;
+        }
+        .param-input input[type="text"] {
+            width: 140px;
+            padding: 4px 6px;
+            font-size: 13px;
+        }
+        .vector-input-group {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .vector-input-group input[type="number"] {
+            width: 60px;
+            padding: 4px 6px;
+            font-size: 13px;
+        }
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .checkbox-row input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            margin: 0;
+        }
+        .checkbox-row label {
+            font-size: 13px;
+        }
+        .output-box {
+            background: #f8f8f8;
+            color: #2d2d30;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            min-height: 200px;
+            max-height: 300px;
+            overflow: auto;
+            white-space: pre;
+            line-height: 1.4;
+        }
+        .button-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .btn {
+            background: #8b5a2b;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            transition: background 0.15s;
+            border: 1px solid #6e451d;
+        }
+        .btn:hover {
+            background: #6e451d;
+        }
+        .btn.secondary {
+            background: #5f6b7a;
+            border-color: #4a555f;
+        }
+        .btn.secondary:hover {
+            background: #4a555f;
+        }
+        .info-note {
+            background: #dbd1c4;
+            padding: 3px 6px;
+            border-radius: 16px;
+            font-size: 10px;
+            color: #2d2d30;
+        }
+        .warning-note {
+            color: #b94a48;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+        .readonly-field {
+            background: #e0e0e0;
+            color: #333;
+            border: 1px solid #aaa;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .modal-header h3 {
+            font-size: 14px;
+            margin: 0;
+        }
+        .close-modal {
+            background: #aaa;
+            border: none;
+            border-radius: 14px;
+            padding: 3px 10px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        /* Periodic Table - scaled down */
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 1fr);
+            gap: 1px;
+            background: #e0e0e0;
+            padding: 6px;
+            border-radius: 5px;
+        }
+        .periodic-element {
+            background: #d0d0d0;
+            border: 1px solid #8b5a2b;
+            border-radius: 2px;
+            padding: 1px 0;
+            text-align: center;
+            font-size: 9px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.1s;
+            display: flex;
+            flex-direction: column;
+            min-width: 30px;
+        }
+        .periodic-element:hover {
+            background: #8b5a2b;
+            color: white;
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        .element-symbol {
+            font-weight: 700;
+            font-size: 10px;
+        }
+        .element-number {
+            font-size: 6px;
+            color: #555;
+        }
+        .periodic-element:hover .element-number {
+            color: #ddd;
+        }
+        .lanthanide-actinide-row {
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            gap: 1px;
+            padding: 6px;
+            background: #d8d8d8;
+            border-radius: 5px;
+        }
+        .lanthanide-actinide-label {
+            grid-column: 1 / -1;
+            font-weight: bold;
+            color: #5a3e1b;
+            margin-bottom: 3px;
+            font-size: 11px;
+        }
+        /* 紧凑的原子位置 */
+        .atoms-compact-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .atom-compact-row {
+            background: #ddd;
+            padding: 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .atom-compact-row strong {
+            min-width: 30px;
+            font-size: 12px;
+        }
+        .atom-element-btn {
+            background: #5f6b7a;
+            border: none;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+            min-width: 40px;
+            text-align: center;
+        }
+        .atom-element-btn:hover {
+            background: #4a555f;
+        }
+        .atom-coord-input {
+            width: 55px;
+            padding: 3px 4px;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        .atom-remove-btn {
+            background: #b94a48;
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .atom-remove-btn:hover {
+            background: #a13836;
+        }
+        .params-container {
+            max-width: 100%;
+        }
+        .flag-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 15px;
+        }
+        .flag-group > div {
+            min-width: 120px;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="app">
+    <div class="header">
+        <div class="logo-area"></div>
+        <div class="title-box">
+            <h1>nephonon</h1>
+            <p>dos | band | isosurface | S(Q,E)</p>
+        </div>
+    </div>
+    <div class="separator"></div>
+
+    <div class="main-scroll" id="scrollable">
+        <div class="tabs" id="tabHeaders">
+            <button class="tab-btn active" data-tab="basic">Basic</button>
+            <button class="tab-btn" data-tab="sqw">S(Q,E)</button>
+            <button class="tab-btn" data-tab="output">Output</button>
+        </div>
+
+        <!-- TAB 1: BASIC & FLAGS -->
+        <div class="tab-pane active" id="tab-basic">
+            <div class="section">
+                <div class="section-title">&basic — dimensions</div>
+                <div class="params-container">
+                    <div class="param-row">
+                        <span class="param-label">ntypes:</span>
+                        <div class="param-input"><input type="number" id="ntypes" value="2" readonly class="readonly-field"></div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">natoms:</span>
+                        <div class="param-input"><input type="number" id="natoms" value="4" readonly class="readonly-field"></div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">nsize:</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="nsize1" value="3" min="1" step="1">
+                                <input type="number" id="nsize2" value="3" min="1" step="1">
+                                <input type="number" id="nsize3" value="3" min="1" step="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="warning-note" id="natomsWarning"></div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">&inputph — switches</div>
+                <div class="flag-group">
+                    <div>
+                        <div class="checkbox-row"><input type="checkbox" id="gen2ndfc"> <label>gen2ndfc</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="dosFlag"> <label>dos</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="bandFlag"> <label>band</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="velocityFlag"> <label>velocity</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="eigenvectorFlag"> <label>eigenvector</label></div>
+                    </div>
+                    <div>
+                        <div class="checkbox-row"><input type="checkbox" id="fcSymmetry"> <label>fc_symmetry</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="nonanalytic"> <label>nonanalytic</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="isosurfaceFlag"> <label>isosurface</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="sqwCrystal"> <label>sqw_crystal</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="sqwPowder"> <label>sqw_powder</label></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Additional</div>
+                <div class="params-container">
+                    <div class="param-row">
+                        <span class="param-label">Displace_DELTA:</span>
+                        <div class="param-input"><input type="number" id="displaceDelta" value="0.01" step="0.001"></div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">DOS_SIGMA:</span>
+                        <div class="param-input"><input type="number" id="dosSigma" value="0.2" step="0.1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">LATTICE_PARAMETERS</div>
+                <div class="params-container">
+                    <div class="param-row">
+                        <span class="param-label">Vector 1:</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="lat00" value="5.431" step="0.001">
+                                <input type="number" id="lat01" value="0.0" step="0.001">
+                                <input type="number" id="lat02" value="0.0" step="0.001">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">Vector 2:</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="lat10" value="0.0" step="0.001">
+                                <input type="number" id="lat11" value="5.431" step="0.001">
+                                <input type="number" id="lat12" value="0.0" step="0.001">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">Vector 3:</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="lat20" value="0.0" step="0.001">
+                                <input type="number" id="lat21" value="0.0" step="0.001">
+                                <input type="number" id="lat22" value="5.431" step="0.001">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">ATOMIC_POSITIONS 
+                    <span class="info-note">click element</span>
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <select id="coordType" style="font-size:12px; padding:3px;"><option value="Direct" selected>Direct</option><option value="Cartesian">Cartesian</option></select>
+                    <button class="btn secondary" id="addAtomBtn" style="margin-left: 8px; padding:2px 8px;">+ Add</button>
+                    <button class="btn secondary" id="removeAtomBtn" style="padding:2px 8px;">- Remove</button>
+                </div>
+                <div id="atomicPositionsContainer" class="atoms-compact-container"></div>
+                <div class="warning-note" id="atomTypeWarning"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Q-mesh</div>
+                <div class="params-container">
+                    <div class="param-row">
+                        <span class="param-label">DOS q-mesh:</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="dosQmesh1" value="20" min="1" step="1">
+                                <input type="number" id="dosQmesh2" value="20" min="1" step="1">
+                                <input type="number" id="dosQmesh3" value="20" min="1" step="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">ISOSURFACE q-mesh:</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="isoQmesh1" value="30" min="1" step="1">
+                                <input type="number" id="isoQmesh2" value="30" min="1" step="1">
+                                <input type="number" id="isoQmesh3" value="30" min="1" step="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapsible expanded" id="collBandPaths">
+                <div class="collapsible-header"><span class="arrow">▶</span> BANDS_STRUCTURE paths</div>
+                <div class="collapsible-content">
+                    <div class="param-row">
+                        <span class="param-label">Number of paths:</span>
+                        <div class="param-input"><input type="number" id="numPaths" value="3" min="1" style="width:70px;"></div>
+                    </div>
+                    <div id="pathsContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: S(Q,E) -->
+        <div class="tab-pane" id="tab-sqw">
+            <div class="section">
+                <div class="section-title">&inputsqw parameters</div>
+                <div class="params-container">
+                    <div class="param-row">
+                        <span class="param-label">e_min / e_max:</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="e_min" value="0.0" style="width:60px;">
+                                <span style="margin:0 2px;">/</span>
+                                <input type="number" id="e_max" value="10.0" style="width:60px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">ne_bins:</span>
+                        <div class="param-input"><input type="number" id="ne_bins" value="1000"></div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">temperature (K):</span>
+                        <div class="param-input"><input type="number" id="sqwTemp" value="300"></div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">dw_qmesh:</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="dwQmesh1" value="10" min="1" step="1">
+                                <input type="number" id="dwQmesh2" value="10" min="1" step="1">
+                                <input type="number" id="dwQmesh3" value="10" min="1" step="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">lphase:</span>
+                        <div class="param-input checkbox-row">
+                            <input type="checkbox" id="lphase"> <label>enable</label>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">q_min / q_max:</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="qmin" value="0.0" style="width:60px;">
+                                <span style="margin:0 2px;">/</span>
+                                <input type="number" id="qmax" value="4.0" style="width:60px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">nq_bins:</span>
+                        <div class="param-input"><input type="number" id="nqBins" value="400"></div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">npts_sphere:</span>
+                        <div class="param-input"><input type="number" id="nptsSphere" value="100" min="1" step="1"></div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">sampling:</span>
+                        <div class="param-input">
+                            <select id="sampling" style="font-size:12px; padding:3px;">
+                                <option value="golden" selected>golden</option>
+                                <option value="random">random</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">e_smearing (5):</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="eSmear0" value="1.17741" step="0.001" style="width:70px;">
+                                <input type="number" id="eSmear1" value="0.0" step="0.001" style="width:70px;">
+                                <input type="number" id="eSmear2" value="0.0" step="0.001" style="width:70px;">
+                                <input type="number" id="eSmear3" value="0.0" step="0.001" style="width:70px;">
+                                <input type="number" id="eSmear4" value="0.0" step="0.001" style="width:70px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="param-row">
+                        <span class="param-label">q_smearing (5):</span>
+                        <div class="param-input">
+                            <div class="vector-input-group">
+                                <input type="number" id="qSmear0" value="0.0" step="0.001" style="width:70px;">
+                                <input type="number" id="qSmear1" value="0.0" step="0.001" style="width:70px;">
+                                <input type="number" id="qSmear2" value="0.0" step="0.001" style="width:70px;">
+                                <input type="number" id="qSmear3" value="0.0" step="0.001" style="width:70px;">
+                                <input type="number" id="qSmear4" value="0.0" step="0.001" style="width:70px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: OUTPUT -->
+        <div class="tab-pane" id="tab-output">
+            <div class="section">
+                <div class="section-title">inp.control (aligned)</div>
+                <div class="output-box" id="outputContent"></div>
+            </div>
+            <div class="button-bar">
+                <button class="btn" id="genBtn">🚀 Generate</button>
+                <button class="btn secondary" id="saveBtn">💾 Save</button>
+                <button class="btn secondary" id="helpBtn">📖 Help</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Periodic Table Modal -->
+    <div class="modal-overlay" id="periodicModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Element</h3>
+                <button class="close-modal" id="closeModal">Close</button>
+            </div>
+            <div id="periodicTableContainer"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // 元素周期表数据：周期、族、符号、名称、原子序数
+        const elementData = [
+            // 第1周期
+            {period:1, group:1, symbol:"H",  name:"Hydrogen", number:1},
+            {period:1, group:18, symbol:"He", name:"Helium", number:2},
+            
+            // 第2周期
+            {period:2, group:1, symbol:"Li", name:"Lithium", number:3},
+            {period:2, group:2, symbol:"Be", name:"Beryllium", number:4},
+            {period:2, group:13, symbol:"B",  name:"Boron", number:5},
+            {period:2, group:14, symbol:"C",  name:"Carbon", number:6},
+            {period:2, group:15, symbol:"N",  name:"Nitrogen", number:7},
+            {period:2, group:16, symbol:"O",  name:"Oxygen", number:8},
+            {period:2, group:17, symbol:"F",  name:"Fluorine", number:9},
+            {period:2, group:18, symbol:"Ne", name:"Neon", number:10},
+            
+            // 第3周期
+            {period:3, group:1, symbol:"Na", name:"Sodium", number:11},
+            {period:3, group:2, symbol:"Mg", name:"Magnesium", number:12},
+            {period:3, group:13, symbol:"Al", name:"Aluminum", number:13},
+            {period:3, group:14, symbol:"Si", name:"Silicon", number:14},
+            {period:3, group:15, symbol:"P",  name:"Phosphorus", number:15},
+            {period:3, group:16, symbol:"S",  name:"Sulfur", number:16},
+            {period:3, group:17, symbol:"Cl", name:"Chlorine", number:17},
+            {period:3, group:18, symbol:"Ar", name:"Argon", number:18},
+            
+            // 第4周期
+            {period:4, group:1, symbol:"K",  name:"Potassium", number:19},
+            {period:4, group:2, symbol:"Ca", name:"Calcium", number:20},
+            {period:4, group:3, symbol:"Sc", name:"Scandium", number:21},
+            {period:4, group:4, symbol:"Ti", name:"Titanium", number:22},
+            {period:4, group:5, symbol:"V",  name:"Vanadium", number:23},
+            {period:4, group:6, symbol:"Cr", name:"Chromium", number:24},
+            {period:4, group:7, symbol:"Mn", name:"Manganese", number:25},
+            {period:4, group:8, symbol:"Fe", name:"Iron", number:26},
+            {period:4, group:9, symbol:"Co", name:"Cobalt", number:27},
+            {period:4, group:10, symbol:"Ni", name:"Nickel", number:28},
+            {period:4, group:11, symbol:"Cu", name:"Copper", number:29},
+            {period:4, group:12, symbol:"Zn", name:"Zinc", number:30},
+            {period:4, group:13, symbol:"Ga", name:"Gallium", number:31},
+            {period:4, group:14, symbol:"Ge", name:"Germanium", number:32},
+            {period:4, group:15, symbol:"As", name:"Arsenic", number:33},
+            {period:4, group:16, symbol:"Se", name:"Selenium", number:34},
+            {period:4, group:17, symbol:"Br", name:"Bromine", number:35},
+            {period:4, group:18, symbol:"Kr", name:"Krypton", number:36},
+            
+            // 第5周期
+            {period:5, group:1, symbol:"Rb", name:"Rubidium", number:37},
+            {period:5, group:2, symbol:"Sr", name:"Strontium", number:38},
+            {period:5, group:3, symbol:"Y",  name:"Yttrium", number:39},
+            {period:5, group:4, symbol:"Zr", name:"Zirconium", number:40},
+            {period:5, group:5, symbol:"Nb", name:"Niobium", number:41},
+            {period:5, group:6, symbol:"Mo", name:"Molybdenum", number:42},
+            {period:5, group:7, symbol:"Tc", name:"Technetium", number:43},
+            {period:5, group:8, symbol:"Ru", name:"Ruthenium", number:44},
+            {period:5, group:9, symbol:"Rh", name:"Rhodium", number:45},
+            {period:5, group:10, symbol:"Pd", name:"Palladium", number:46},
+            {period:5, group:11, symbol:"Ag", name:"Silver", number:47},
+            {period:5, group:12, symbol:"Cd", name:"Cadmium", number:48},
+            {period:5, group:13, symbol:"In", name:"Indium", number:49},
+            {period:5, group:14, symbol:"Sn", name:"Tin", number:50},
+            {period:5, group:15, symbol:"Sb", name:"Antimony", number:51},
+            {period:5, group:16, symbol:"Te", name:"Tellurium", number:52},
+            {period:5, group:17, symbol:"I",  name:"Iodine", number:53},
+            {period:5, group:18, symbol:"Xe", name:"Xenon", number:54},
+            
+            // 第6周期
+            {period:6, group:1, symbol:"Cs", name:"Cesium", number:55},
+            {period:6, group:2, symbol:"Ba", name:"Barium", number:56},
+            {period:6, group:3, symbol:"Lu", name:"Lutetium", number:71},
+            {period:6, group:4, symbol:"Hf", name:"Hafnium", number:72},
+            {period:6, group:5, symbol:"Ta", name:"Tantalum", number:73},
+            {period:6, group:6, symbol:"W",  name:"Tungsten", number:74},
+            {period:6, group:7, symbol:"Re", name:"Rhenium", number:75},
+            {period:6, group:8, symbol:"Os", name:"Osmium", number:76},
+            {period:6, group:9, symbol:"Ir", name:"Iridium", number:77},
+            {period:6, group:10, symbol:"Pt", name:"Platinum", number:78},
+            {period:6, group:11, symbol:"Au", name:"Gold", number:79},
+            {period:6, group:12, symbol:"Hg", name:"Mercury", number:80},
+            {period:6, group:13, symbol:"Tl", name:"Thallium", number:81},
+            {period:6, group:14, symbol:"Pb", name:"Lead", number:82},
+            {period:6, group:15, symbol:"Bi", name:"Bismuth", number:83},
+            {period:6, group:16, symbol:"Po", name:"Polonium", number:84},
+            {period:6, group:17, symbol:"At", name:"Astatine", number:85},
+            {period:6, group:18, symbol:"Rn", name:"Radon", number:86},
+            
+            // 第7周期
+            {period:7, group:1, symbol:"Fr", name:"Francium", number:87},
+            {period:7, group:2, symbol:"Ra", name:"Radium", number:88},
+            {period:7, group:3, symbol:"Lr", name:"Lawrencium", number:103},
+            {period:7, group:4, symbol:"Rf", name:"Rutherfordium", number:104},
+            {period:7, group:5, symbol:"Db", name:"Dubnium", number:105},
+            {period:7, group:6, symbol:"Sg", name:"Seaborgium", number:106},
+            {period:7, group:7, symbol:"Bh", name:"Bohrium", number:107},
+            {period:7, group:8, symbol:"Hs", name:"Hassium", number:108},
+            {period:7, group:9, symbol:"Mt", name:"Meitnerium", number:109},
+            {period:7, group:10, symbol:"Ds", name:"Darmstadtium", number:110},
+            {period:7, group:11, symbol:"Rg", name:"Roentgenium", number:111},
+            {period:7, group:12, symbol:"Cn", name:"Copernicium", number:112},
+            {period:7, group:13, symbol:"Nh", name:"Nihonium", number:113},
+            {period:7, group:14, symbol:"Fl", name:"Flerovium", number:114},
+            {period:7, group:15, symbol:"Mc", name:"Moscovium", number:115},
+            {period:7, group:16, symbol:"Lv", name:"Livermorium", number:116},
+            {period:7, group:17, symbol:"Ts", name:"Tennessine", number:117},
+            {period:7, group:18, symbol:"Og", name:"Oganesson", number:118}
+        ];
+
+        // 镧系元素 (57-71)
+        const lanthanides = [
+            {symbol:"La", name:"Lanthanum", number:57},
+            {symbol:"Ce", name:"Cerium", number:58},
+            {symbol:"Pr", name:"Praseodymium", number:59},
+            {symbol:"Nd", name:"Neodymium", number:60},
+            {symbol:"Pm", name:"Promethium", number:61},
+            {symbol:"Sm", name:"Samarium", number:62},
+            {symbol:"Eu", name:"Europium", number:63},
+            {symbol:"Gd", name:"Gadolinium", number:64},
+            {symbol:"Tb", name:"Terbium", number:65},
+            {symbol:"Dy", name:"Dysprosium", number:66},
+            {symbol:"Ho", name:"Holmium", number:67},
+            {symbol:"Er", name:"Erbium", number:68},
+            {symbol:"Tm", name:"Thulium", number:69},
+            {symbol:"Yb", name:"Ytterbium", number:70},
+            {symbol:"Lu", name:"Lutetium", number:71}
+        ];
+
+        // 锕系元素 (89-103)
+        const actinides = [
+            {symbol:"Ac", name:"Actinium", number:89},
+            {symbol:"Th", name:"Thorium", number:90},
+            {symbol:"Pa", name:"Protactinium", number:91},
+            {symbol:"U", name:"Uranium", number:92},
+            {symbol:"Np", name:"Neptunium", number:93},
+            {symbol:"Pu", name:"Plutonium", number:94},
+            {symbol:"Am", name:"Americium", number:95},
+            {symbol:"Cm", name:"Curium", number:96},
+            {symbol:"Bk", name:"Berkelium", number:97},
+            {symbol:"Cf", name:"Californium", number:98},
+            {symbol:"Es", name:"Einsteinium", number:99},
+            {symbol:"Fm", name:"Fermium", number:100},
+            {symbol:"Md", name:"Mendelevium", number:101},
+            {symbol:"No", name:"Nobelium", number:102},
+            {symbol:"Lr", name:"Lawrencium", number:103}
+        ];
+
+        let atomPositions = [
+            {element: "Si", x: 0.0, y: 0.0, z: 0.0},
+            {element: "O", x: 0.25, y: 0.25, z: 0.25},
+            {element: "Si", x: 0.5, y: 0.5, z: 0.5},
+            {element: "O", x: 0.75, y: 0.75, z: 0.75}
+        ];
+
+        let currentAtomIndex = null;
+
+        function boolToF(b) { return b ? '.true.' : '.false.'; }
+
+        function getUniqueElements() {
+            const unique = [];
+            atomPositions.forEach(atom => {
+                if (!unique.includes(atom.element)) {
+                    unique.push(atom.element);
+                }
+            });
+            return unique;
+        }
+
+        function updateTypesAndAtoms() {
+            const ntypesField = document.getElementById('ntypes');
+            const natomsField = document.getElementById('natoms');
+            const uniqueElements = getUniqueElements();
+            ntypesField.value = uniqueElements.length;
+            natomsField.value = atomPositions.length;
+            document.getElementById('natomsWarning').innerText = '';
+        }
+
+        // 渲染标准周期表
+        function renderStandardPeriodicTable() {
+            const container = document.getElementById('periodicTableContainer');
+            
+            // 主表格
+            let html = '<div class="periodic-table">';
+            
+            // 创建一个18列的网格，按周期和族填充
+            const grid = Array(9).fill().map(() => Array(19).fill(null));
+            
+            // 填充数据
+            elementData.forEach(elem => {
+                if (elem.period <= 7) {
+                    grid[elem.period][elem.group] = elem;
+                }
+            });
+            
+            // 生成HTML
+            for (let period = 1; period <= 7; period++) {
+                for (let group = 1; group <= 18; group++) {
+                    const elem = grid[period][group];
+                    if (elem) {
+                        html += `<div class="periodic-element" data-symbol="${elem.symbol}" data-number="${elem.number}" data-name="${elem.name}">
+                            <span class="element-symbol">${elem.symbol}</span>
+                            <span class="element-number">${elem.number}</span>
+                        </div>`;
+                    } else {
+                        // 空单元格，用于占位
+                        html += `<div style="visibility: hidden;"></div>`;
+                    }
+                }
+            }
+            html += '</div>';
+            
+            // 镧系元素
+            html += '<div class="lanthanide-actinide-row">';
+            html += '<div class="lanthanide-actinide-label">Lanthanides</div>';
+            lanthanides.forEach(elem => {
+                html += `<div class="periodic-element" data-symbol="${elem.symbol}" data-number="${elem.number}" data-name="${elem.name}">
+                    <span class="element-symbol">${elem.symbol}</span>
+                    <span class="element-number">${elem.number}</span>
+                </div>`;
+            });
+            html += '</div>';
+            
+            // 锕系元素
+            html += '<div class="lanthanide-actinide-row">';
+            html += '<div class="lanthanide-actinide-label">Actinides</div>';
+            actinides.forEach(elem => {
+                html += `<div class="periodic-element" data-symbol="${elem.symbol}" data-number="${elem.number}" data-name="${elem.name}">
+                    <span class="element-symbol">${elem.symbol}</span>
+                    <span class="element-number">${elem.number}</span>
+                </div>`;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+
+            // 添加点击事件
+            container.querySelectorAll('.periodic-element').forEach(elemDiv => {
+                elemDiv.addEventListener('click', () => {
+                    const symbol = elemDiv.dataset.symbol;
+                    if (currentAtomIndex !== null) {
+                        atomPositions[currentAtomIndex].element = symbol;
+                        renderAtomicPositions();
+                        updateTypesAndAtoms();
+                        closeModal();
+                    }
+                });
+            });
+        }
+
+        function openModal(atomIndex) {
+            currentAtomIndex = atomIndex;
+            renderStandardPeriodicTable();
+            document.getElementById('periodicModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('periodicModal').style.display = 'none';
+            currentAtomIndex = null;
+        }
+
+        // 紧凑的原子位置渲染
+        function renderAtomicPositions() {
+            const container = document.getElementById('atomicPositionsContainer');
+            
+            let html = '';
+            
+            atomPositions.forEach((atom, idx) => {
+                html += `<div class="atom-compact-row">
+                    <strong>#${idx+1}</strong>
+                    <button class="atom-element-btn element-select-btn" data-atom-index="${idx}">
+                        ${atom.element || '?'}
+                    </button>
+                    <input type="number" class="atom-pos-x" data-atom-index="${idx}" value="${atom.x}" step="0.001" placeholder="x" class="atom-coord-input" style="width:55px; padding:3px 4px; border:1px solid #aaa; border-radius:3px;">
+                    <input type="number" class="atom-pos-y" data-atom-index="${idx}" value="${atom.y}" step="0.001" placeholder="y" style="width:55px; padding:3px 4px; border:1px solid #aaa; border-radius:3px;">
+                    <input type="number" class="atom-pos-z" data-atom-index="${idx}" value="${atom.z}" step="0.001" placeholder="z" style="width:55px; padding:3px 4px; border:1px solid #aaa; border-radius:3px;">
+                    <button class="atom-remove-btn remove-atom-btn" data-atom-index="${idx}">✖</button>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+
+            container.querySelectorAll('.element-select-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = e.target.dataset.atomIndex;
+                    openModal(parseInt(idx));
+                });
+            });
+
+            container.querySelectorAll('.atom-pos-x').forEach(inp => {
+                inp.addEventListener('input', (e) => {
+                    const idx = e.target.dataset.atomIndex;
+                    atomPositions[idx].x = parseFloat(e.target.value) || 0.0;
+                });
+            });
+            container.querySelectorAll('.atom-pos-y').forEach(inp => {
+                inp.addEventListener('input', (e) => {
+                    const idx = e.target.dataset.atomIndex;
+                    atomPositions[idx].y = parseFloat(e.target.value) || 0.0;
+                });
+            });
+            container.querySelectorAll('.atom-pos-z').forEach(inp => {
+                inp.addEventListener('input', (e) => {
+                    const idx = e.target.dataset.atomIndex;
+                    atomPositions[idx].z = parseFloat(e.target.value) || 0.0;
+                });
+            });
+
+            container.querySelectorAll('.remove-atom-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(e.target.dataset.atomIndex);
+                    if (atomPositions.length > 1) {
+                        atomPositions.splice(idx, 1);
+                        renderAtomicPositions();
+                        updateTypesAndAtoms();
+                    } else {
+                        alert('At least one atom required');
+                    }
+                });
+            });
+
+            updateTypesAndAtoms();
+        }
+
+        function collectState() {
+            const uniqueElements = getUniqueElements();
+            const elementsStr = uniqueElements.join(', ');
+            
+            const counts = {};
+            atomPositions.forEach(atom => {
+                counts[atom.element] = (counts[atom.element] || 0) + 1;
+            });
+            const countsArray = uniqueElements.map(elem => counts[elem] || 0);
+            const natStr = countsArray.join(', ');
+            
+            return {
+                ntypes: document.getElementById('ntypes').value,
+                natoms: atomPositions.length,
+                nsize: `${document.getElementById('nsize1').value}, ${document.getElementById('nsize2').value}, ${document.getElementById('nsize3').value}`,
+                elements: elementsStr,
+                natPerElem: natStr,
+                gen2ndfc: document.getElementById('gen2ndfc').checked,
+                dosFlag: document.getElementById('dosFlag').checked,
+                bandFlag: document.getElementById('bandFlag').checked,
+                velocityFlag: document.getElementById('velocityFlag').checked,
+                eigenvectorFlag: document.getElementById('eigenvectorFlag').checked,
+                fcSymmetry: document.getElementById('fcSymmetry').checked,
+                nonanalytic: document.getElementById('nonanalytic').checked,
+                isosurfaceFlag: document.getElementById('isosurfaceFlag').checked,
+                sqwCrystal: document.getElementById('sqwCrystal').checked,
+                sqwPowder: document.getElementById('sqwPowder').checked,
+                displaceDelta: document.getElementById('displaceDelta').value,
+                dosSigma: document.getElementById('dosSigma').value,
+                e_min: document.getElementById('e_min').value,
+                e_max: document.getElementById('e_max').value,
+                ne_bins: document.getElementById('ne_bins').value,
+                sqwTemp: document.getElementById('sqwTemp').value,
+                dwQmesh: `${document.getElementById('dwQmesh1').value} ${document.getElementById('dwQmesh2').value} ${document.getElementById('dwQmesh3').value}`,
+                lphase: document.getElementById('lphase').checked,
+                qmin: document.getElementById('qmin').value,
+                qmax: document.getElementById('qmax').value,
+                nqBins: document.getElementById('nqBins').value,
+                nptsSphere: document.getElementById('nptsSphere').value,
+                sampling: document.getElementById('sampling').value,
+                eSmearing: [
+                    document.getElementById('eSmear0').value,
+                    document.getElementById('eSmear1').value,
+                    document.getElementById('eSmear2').value,
+                    document.getElementById('eSmear3').value,
+                    document.getElementById('eSmear4').value
+                ],
+                qSmearing: [
+                    document.getElementById('qSmear0').value,
+                    document.getElementById('qSmear1').value,
+                    document.getElementById('qSmear2').value,
+                    document.getElementById('qSmear3').value,
+                    document.getElementById('qSmear4').value
+                ],
+                lat: [
+                    [document.getElementById('lat00').value, document.getElementById('lat01').value, document.getElementById('lat02').value],
+                    [document.getElementById('lat10').value, document.getElementById('lat11').value, document.getElementById('lat12').value],
+                    [document.getElementById('lat20').value, document.getElementById('lat21').value, document.getElementById('lat22').value]
+                ],
+                coordType: document.getElementById('coordType').value,
+                atomPositions: atomPositions.map(a => ({...a})),
+                dosQmesh: `${document.getElementById('dosQmesh1').value} ${document.getElementById('dosQmesh2').value} ${document.getElementById('dosQmesh3').value}`,
+                isoQmesh: `${document.getElementById('isoQmesh1').value} ${document.getElementById('isoQmesh2').value} ${document.getElementById('isoQmesh3').value}`,
+                numPaths: document.getElementById('numPaths').value,
+            };
+        }
+
+        function renderPaths() {
+            const container = document.getElementById('pathsContainer');
+            const num = parseInt(document.getElementById('numPaths').value) || 3;
+            let html = '';
+            for (let i=0; i<num; i++) {
+                let start1='0.0', start2='0.0', start3='0.0', end1='0.5', end2='0.0', end3='0.0', npts='50';
+                if (i===1) { start1='0.5'; start2='0.0'; start3='0.0'; end1='0.5'; end2='0.5'; end3='0.0'; }
+                if (i===2) { start1='0.5'; start2='0.5'; start3='0.0'; end1='0.0'; end2='0.0'; end3='0.0'; }
+                html += `<div style="margin: 6px 0; background:#ddd; padding:6px;border-radius:4px;">
+                    <div style="margin-bottom:3px;"><strong>Path ${i+1}</strong></div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <div>Start: 
+                            <input type="number" class="pathStart1" value="${start1}" step="0.001" style="width:50px;">
+                            <input type="number" class="pathStart2" value="${start2}" step="0.001" style="width:50px;">
+                            <input type="number" class="pathStart3" value="${start3}" step="0.001" style="width:50px;">
+                        </div>
+                        <div>End: 
+                            <input type="number" class="pathEnd1" value="${end1}" step="0.001" style="width:50px;">
+                            <input type="number" class="pathEnd2" value="${end2}" step="0.001" style="width:50px;">
+                            <input type="number" class="pathEnd3" value="${end3}" step="0.001" style="width:50px;">
+                        </div>
+                        <div>Points: <input type="number" class="pathNpoints" value="${npts}" style="width:50px;"></div>
+                    </div>
+                </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // 按照elements顺序排序原子位置
+        function sortAtomsByElementOrder() {
+            const s = collectState();
+            const elementList = s.elements.split(',').map(e => e.trim());
+            
+            // 创建一个映射：element -> 该元素的所有原子
+            const elementToAtoms = {};
+            atomPositions.forEach(atom => {
+                if (!elementToAtoms[atom.element]) {
+                    elementToAtoms[atom.element] = [];
+                }
+                elementToAtoms[atom.element].push(atom);
+            });
+            
+            // 按照elementList的顺序重新排列
+            const sortedAtoms = [];
+            elementList.forEach(elem => {
+                if (elementToAtoms[elem]) {
+                    sortedAtoms.push(...elementToAtoms[elem]);
+                }
+            });
+            
+            // 更新atomPositions
+            atomPositions = sortedAtoms;
+        }
+
+        // 生成对齐的输出（无注释）
+        function generateAlignedOutput() {
+            // 先按照elements顺序排序原子
+            sortAtomsByElementOrder();
+            
+            const s = collectState();
+            
+            const pathStarts1 = document.querySelectorAll('.pathStart1');
+            const pathStarts2 = document.querySelectorAll('.pathStart2');
+            const pathStarts3 = document.querySelectorAll('.pathStart3');
+            const pathEnds1 = document.querySelectorAll('.pathEnd1');
+            const pathEnds2 = document.querySelectorAll('.pathEnd2');
+            const pathEnds3 = document.querySelectorAll('.pathEnd3');
+            const pathNpts = document.querySelectorAll('.pathNpoints');
+            
+            let pathLines = [];
+            for (let i=0; i<pathStarts1.length; i++) {
+                pathLines.push(`${pathStarts1[i].value} ${pathStarts2[i].value} ${pathStarts3[i].value} ${pathEnds1[i].value} ${pathEnds2[i].value} ${pathEnds3[i].value} ${pathNpts[i].value}`);
+            }
+
+            let lines = [];
+            lines.push('&basic');
+            lines.push(`     ntypes = ${s.ntypes}`);
+            lines.push(`     natoms = ${s.natoms}`);
+            lines.push(`      nsize = ${s.nsize}`);
+            lines.push('/');
+            lines.push('&inputph');
+            lines.push(`   elements = ${s.elements.split(',').map(e => `'${e.trim()}'`).join(', ')}`);
+            lines.push(`        nat = ${s.natPerElem}`);
+            lines.push(`   gen2ndfc = ${boolToF(s.gen2ndfc)}`);
+            lines.push(`        dos = ${boolToF(s.dosFlag)}`);
+            lines.push(`       band = ${boolToF(s.bandFlag)}`);
+            lines.push(`   velocity = ${boolToF(s.velocityFlag)}`);
+            lines.push(`eigenvector = ${boolToF(s.eigenvectorFlag)}`);
+            lines.push(`fc_symmetry = ${boolToF(s.fcSymmetry)}`);
+            lines.push(`nonanalytic = ${boolToF(s.nonanalytic)}`);
+            lines.push(` isosurface = ${boolToF(s.isosurfaceFlag)}`);
+            lines.push(`sqw_crystal = ${boolToF(s.sqwCrystal)}`);
+            lines.push(` sqw_powder = ${boolToF(s.sqwPowder)}`);
+            lines.push('/');
+            if (s.sqwCrystal || s.sqwPowder) {
+                lines.push('&inputsqw');
+                lines.push(`      e_min = ${s.e_min}`);
+                lines.push(`      e_max = ${s.e_max}`);
+                lines.push(`    ne_bins = ${s.ne_bins}`);
+                lines.push(`e_smearing = ${s.eSmearing.join(' ')}`);
+                lines.push(`q_smearing = ${s.qSmearing.join(' ')}`);
+                lines.push(`temperature = ${s.sqwTemp}`);
+                lines.push(`   dw_qmesh = ${s.dwQmesh}`);
+                lines.push(`     lphase = ${boolToF(s.lphase)}`);
+                lines.push(`      q_min = ${s.qmin}`);
+                lines.push(`      q_max = ${s.qmax}`);
+                lines.push(`    nq_bins = ${s.nqBins}`);
+                lines.push(`npts_sphere = ${s.nptsSphere}`);
+                lines.push(`   sampling = '${s.sampling}'`);
+                lines.push('/');
+            }
+            if (s.gen2ndfc) {
+                lines.push('Displace_DELTA');
+                lines.push(` ${s.displaceDelta}`);
+            }
+            if (s.dosFlag) {
+                lines.push('DOS_SIGMA');
+                lines.push(` ${s.dosSigma}`);
+            }
+            lines.push('LATTICE_PARAMETERS');
+            for (let i=0; i<3; i++) {
+                lines.push(` ${s.lat[i][0]} ${s.lat[i][1]} ${s.lat[i][2]}`);
+            }
+            lines.push('ATOMIC_POSITIONS');
+            lines.push(`${s.coordType}`);
+            
+            // 原子坐标已经排序，直接输出
+            s.atomPositions.forEach((atom) => {
+                lines.push(` ${atom.x} ${atom.y} ${atom.z}`);
+            });
+            
+            if (s.dosFlag) {
+                lines.push('DENSITY_OF_STATES');
+                lines.push(` ${s.dosQmesh}`);
+            }
+            if (s.isosurfaceFlag) {
+                lines.push('ISOSURFACE');
+                lines.push(` ${s.isoQmesh}`);
+            }
+            if ((s.bandFlag || s.sqwCrystal) && pathLines.length>0) {
+                lines.push('BANDS_STRUCTURE');
+                lines.push(` ${pathLines.length}`);
+                pathLines.forEach(p => lines.push(` ${p}`));
+            }
+            return lines.join('\n');
+        }
+
+        function setup() {
+            renderAtomicPositions();
+            renderPaths();
+
+            document.getElementById('addAtomBtn').addEventListener('click', () => {
+                const defaultElement = atomPositions.length > 0 ? atomPositions[0].element : 'H';
+                atomPositions.push({element: defaultElement, x: 0.0, y: 0.0, z: 0.0});
+                renderAtomicPositions();
+            });
+
+            document.getElementById('removeAtomBtn').addEventListener('click', () => {
+                if (atomPositions.length > 1) {
+                    atomPositions.pop();
+                    renderAtomicPositions();
+                } else {
+                    alert('At least one atom required');
+                }
+            });
+
+            document.getElementById('numPaths').addEventListener('input', renderPaths);
+
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('periodicModal').addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay')) {
+                    closeModal();
+                }
+            });
+
+            document.getElementById('genBtn').addEventListener('click', ()=>{
+                const content = generateAlignedOutput();
+                document.getElementById('outputContent').innerText = content;
+                // 重新渲染原子位置以反映排序后的顺序
+                renderAtomicPositions();
+            });
+
+            document.getElementById('saveBtn').addEventListener('click', ()=>{
+                const content = document.getElementById('outputContent').innerText || generateAlignedOutput();
+                const blob = new Blob([content], {type: 'text/plain'});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'inp.control';
+                a.click();
+                alert('inp.control downloaded');
+            });
+
+            document.getElementById('helpBtn').addEventListener('click', ()=>{
+                alert(
+                    'nephonon usage\\n\\n' +
+                    '- Run the executable in a working directory containing inp.control.\\n' +
+                    '- Optional inputs: FORCE_CONSTANTS (Phonopy), inp.lotosplitting (nonanalytic), nep.txt (gen2ndfc).\\n\\n' +
+                    'Input blocks in inp.control:\\n' +
+                    '- LATTICE_PARAMETERS (Angstrom)\\n' +
+                    '- ATOMIC_POSITIONS (Direct fractional or Cartesian Angstrom)\\n' +
+                    '- DENSITY_OF_STATES: required if dos = .true.\\n' +
+                    '- DOS_SIGMA (meV): required if dos = .true.\\n' +
+                    '- BANDS_STRUCTURE: required if band = .true. or sqw_crystal = .true.\\n' +
+                    '- ISOSURFACE: required if isosurface = .true.\\n' +
+                    '- Displace_DELTA (Angstrom): required if gen2ndfc = .true.'
+                );
+            });
+
+            document.querySelectorAll('.collapsible-header').forEach(h => {
+                h.addEventListener('click', function(e) {
+                    const parent = this.parentElement;
+                    parent.classList.toggle('expanded');
+                });
+            });
+
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const panes = document.querySelectorAll('.tab-pane');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    panes.forEach(p => p.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+                });
+            });
+
+            document.getElementById('outputContent').innerText = generateAlignedOutput();
+        }
+
+        setup();
+    })();
+</script>
+</body>
+</html>
