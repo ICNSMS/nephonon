@@ -21,9 +21,11 @@
 
 ### 1. Dynamical Matrix
 The dynamical matrix $D_{\alpha\beta}(\kappa\kappa'|\mathbf{q})$ is calculated as:
+
 $
 D_{\alpha\beta}(\kappa\kappa'|\mathbf{q}) = \frac{1}{\sqrt{M_\kappa M_{\kappa'}}} \sum_{l'} \Phi_{\alpha\beta}(0\kappa, l'\kappa') e^{i\mathbf{q}\cdot(\mathbf{r}_{l'\kappa'} - \mathbf{r}_{0\kappa})}
 $
+
 where $\Phi$ are the force constants, $M$ are atomic masses, and $\mathbf{r}$ are atomic positions.
 
 ### 2. Phonon Density of States (DOS)
