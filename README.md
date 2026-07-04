@@ -1,6 +1,6 @@
 # nephonon
 
-**nephonon** is a software package tailored for rapid and reliable phonon calculations in large-scale systems. It employs a hybrid architecture, with core phonon modules implemented in Modern Fortran and computationally intensive force evaluations delegated to the [CPU-based NEP calculator](https://github.com/brucefan1983/NEP_CPU), which leverages the neuroevolution potentials (NEPs) originally introduced in [the GPUMD package](https://github.com/brucefan1983/GPUMD). The package supports force constants imported from Phonopy via the full-format `FORCE_CONSTANTS` file, as well as those directly generated using the finite-displacement method with NEPs.
+**nephonon** is a software package tailored for rapid and reliable phonon calculations in large-scale systems. It employs a hybrid architecture, with core phonon modules implemented in Modern Fortran and computationally intensive force evaluations delegated to [the CPU-based NEP calculator](https://github.com/brucefan1983/NEP_CPU), which leverages the neuroevolution potentials (NEPs) originally introduced in [the GPUMD package](https://github.com/brucefan1983/GPUMD). The package supports force constants imported from Phonopy via the full-format `FORCE_CONSTANTS` file, as well as those directly generated using the finite-displacement method with NEPs.
 
 ## Features
 
