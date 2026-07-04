@@ -5,7 +5,7 @@
 ## Features
 
 - **Force Constant Calculation**: 
-  - Read from Phonopy `FORCE_CONSTANTS` file.
+  - Read from phonopy `FORCE_CONSTANTS` file in the Full format.
   - Generate `FORCE_CONSTANTS` using NEPs (Neuroevolution Potentials) via finite differences (`gen2ndfc`).
 - **Phonon Band Structure**: Calculate phonon dispersion relations along high-symmetry paths.
 - **Density of States (DOS)**: Calculate phonon density of states using Gaussian smearing.
