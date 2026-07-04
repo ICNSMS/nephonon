@@ -11,7 +11,7 @@
 - **Density of States (DOS)**: Calculate phonon density of states using Gaussian smearing.
 - **Neutron Scattering Intensity**:
   - **Single Crystal $S(\mathbf{Q},\omega)$**: Calculate coherent one-phonon dynamic structure factor.
-  - **Powder $S(|Q|,\omega)$**: Calculate powder-averaged neutron scattering intensity.
+  - **Powder $S(|\mathbf{Q}|,\omega)$**: Calculate powder-averaged neutron scattering intensity.
 - **Group Velocity**: Calculate phonon group velocities analytically.
 - **Isosurface**: Calculate phonon frequency isosurfaces in reciprocal space.
 - **LO-TO Splitting**: Support for non-analytic correction using Born effective charges and dielectric tensor.
