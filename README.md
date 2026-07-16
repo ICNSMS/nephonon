@@ -95,7 +95,7 @@ nephonon: $(CPP_OBJS) $(PHONON_OBJS)
 ### Verified Software Environment
 | Compiler | Dynamic Link Library |
 |----------|----------------------|
-| g++ (GCC) 8.3.1; ifort (IFORT) 2021.5.0 | linux-vdso.so.1;libmkl_intel_lp64.so.2;libmkl_intel_thread.so.2;libmkl_core.so.2;libiomp5.so;libstdc++.so.6;libm.so.6;libpthread.so.0;libc.so.6;libgcc_s.so.1;libdl.so.2;librt.so.1;ld-linux-x86-64.so.2 |
+| g++ (GCC) 8.3.1; ifort (IFORT) 2021.5.0 | linux-vdso.so.1;libmkl_intel_lp64.so.2;<br>libmkl_intel_thread.so.2;<br>libmkl_core.so.2;libiomp5.so;libstdc++.so.6;libm.so.6;libpthread.so.0;libc.so.6;libgcc_s.so.1;libdl.so.2;librt.so.1;ld-linux-x86-64.so.2 |
 | g++ (GCC) 8.3.1; ifort (IFORT) 2021.7.0 | linux-vdso.so.1;libmkl_intel_lp64.so.2;libmkl_intel_thread.so.2;libmkl_core.so.2;libiomp5.so;libstdc++.so.6;libm.so.6;libpthread.so.0;libc.so.6;libgcc_s.so.1;libdl.so.2;librt.so.1;ld-linux-x86-64.so.2 |
 | Intel(R) oneAPI DPC++/C++ Compiler 2021.3.0; ifx (IFORT) 2021.3.0 Beta 20210619 | linux-vdso.so.1;libmkl_intel_lp64.so.1;libmkl_intel_thread.so.1;libmkl_core.so.2;libiomp5.so;libstdc++.so.6;libm.so.6;libpthread.so.0;libc.so.6;libgcc_s.so.1;libdl.so.2;librt.so.1;ld-linux-x86-64.so.2 |
 | g++ (x86_64-win32-seh-rev0, Built by MinGW-Builds project) 15.2.0; GNU Fortran (x86_64-win32-seh-rev0, Built by MinGW-Builds project) 15.2.0 | ntdll.dll;KERNEL32.DLL; KERNELBASE.dll; apphelp.dll; ucrtbase.dll; libblas.dll; msvcrt.dll;liblapack.dll;libgcc_s_seh-1.dll;libgfortran-5.dll;libgfortran-5.dll;libgfortran-5.dll;ADVAPI32.dll;sechost.dll;RPCRT4.dll; libwinpthread-1.dll; libstdc++-6.dll; libquadmath-0.dll |
