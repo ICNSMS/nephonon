@@ -183,7 +183,7 @@ Contains
     Write (*, '(a)') '        e_min = 0.0          ! Energy start (meV)'
     Write (*, '(a)') '        e_max = 10.0         ! Energy end (meV)'
     Write (*, '(a)') '      ne_bins = 1000         ! Number of energy bins'
-    Write (*, '(a)') '   e_smearing = 1.17741 0.0 0.0 0.0 0.0  ! FWHM broadening polynomial (meV)'
+    Write (*, '(a)') '   e_smearing = 0.6 0.0 0.001 0.0 0.0  ! FWHM broadening polynomial (meV)'
     Write (*, '(a)') '  temperature = 300          ! Temperature in Kelvin'
     Write (*, '(a)') '     dw_qmesh = 10 10 10     ! Q-mesh for Debye-Waller factor calculation'
     Write (*, '(a)') '       lphase = .false.      ! '
