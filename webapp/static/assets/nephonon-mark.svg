@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">NEPHONON</title>
+  <desc id="desc">A shield-shaped N and phonon wave symbol</desc>
+  <path d="M32 3 56 11v24c0 13-9.7 21.2-24 26C17.7 56.2 8 48 8 35V11L32 3Z" fill="#ffffff" stroke="#125cb8" stroke-width="3"/>
+  <path d="M14.5 15.5 32 9.8l17.5 5.7v18.8c0 9.2-6.6 15.6-17.5 20-10.9-4.4-17.5-10.8-17.5-20V15.5Z" fill="#082b58"/>
+  <path d="M19 40V23l13 18V23" fill="none" stroke="#31c8ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 40 45 23v17" fill="none" stroke="#ffbd25" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="45" cy="18" r="3.2" fill="#31c8ff"/>
+</svg>

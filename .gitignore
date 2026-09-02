@@ -1,0 +1,38 @@
+# Local secrets
+webapp/.env
+
+# Generated calculations and deploy bundles
+webapp/jobs/
+webapp/upload_samples/
+outputs/
+demo_outputs/
+webapp/*.log
+webapp/*.pid
+
+# Local database/runtime files
+.runtime/
+
+# Python runtime files
+__pycache__/
+*.py[cod]
+
+# Local Fortran build products (release binaries under windowsexe stay tracked)
+src/*.o
+src/*.mod
+src/*.exe
+src/*.dll
+src/*.bak*
+src/nephonon
+example/Copper/*.exe
+example/Copper/*.dll
+
+# Downloaded/reference material that is not part of the application
+article_read/
+webexample/
+nephonon_r2.docx
+
+# Editor and operating-system metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

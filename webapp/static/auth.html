@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="科研智能计算平台账户登录与注册。" />
+    <title>账户登录｜科研智能计算平台</title>
+    <link rel="icon" type="image/svg+xml" href="/static/assets/nephonon-mark.svg" />
+    <style>
+      :root {
+        --ink: #08264a;
+        --muted: #6a788a;
+        --navy: #052950;
+        --blue: #1269bd;
+        --cyan: #28b9f2;
+        --line: #dce6f0;
+        --error: #b42318;
+        --success: #1d7658;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          linear-gradient(rgba(244, 249, 253, 0.88), rgba(235, 244, 251, 0.94)),
+          radial-gradient(circle at 18% 20%, rgba(40, 185, 242, 0.28), transparent 30%),
+          radial-gradient(circle at 82% 78%, rgba(18, 105, 189, 0.22), transparent 32%),
+          #edf5fb;
+        font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.26;
+        background-image: radial-gradient(#68a7db 0.8px, transparent 0.8px);
+        background-size: 22px 22px;
+      }
+      .site-header {
+        position: fixed;
+        z-index: 10;
+        inset: 0 0 auto;
+        height: 76px;
+        display: flex;
+        align-items: center;
+        background: transparent;
+      }
+      .header-inner { width: min(1180px, calc(100% - 40px)); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+      .brand { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
+      .brand img { width: 43px; height: 43px; }
+      .brand-copy strong { display: block; font-size: 18px; }
+      .brand-copy span { display: block; margin-top: 4px; color: #7a899b; font-size: 10px; letter-spacing: 0.06em; }
+      .home-link { padding: 10px 15px; color: #345775; font-size: 13px; font-weight: 800; text-decoration: none; border: 1px solid #d6e1eb; border-radius: 8px; background: #fff; }
+      .header-actions { display: flex; align-items: center; gap: 14px; }
+      .language { display: flex; align-items: center; gap: 5px; color: #a1adba; white-space: nowrap; }
+      .language button { padding: 2px; color: #7c8b9c; font: inherit; font-size: 13px; border: 0; background: transparent; cursor: pointer; }
+      .language button:hover, .language button.active { color: var(--ink); font-weight: 800; }
+
+      .auth-shell {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        min-height: 100vh;
+        margin: 0 auto;
+        display: grid;
+        place-items: center;
+        padding: 96px 20px 38px;
+      }
+      .auth-card { width: min(100%, 430px); padding: 34px; border: 1px solid rgba(197, 215, 231, 0.95); border-radius: 20px; background: rgba(255, 255, 255, 0.94); box-shadow: 0 28px 70px rgba(8, 42, 78, 0.15); backdrop-filter: blur(18px); }
+      .card-brand { display: flex; align-items: center; justify-content: center; gap: 11px; margin-bottom: 25px; }
+      .card-brand img { width: 38px; height: 38px; }
+      .card-brand strong { display: block; font-size: 16px; }
+      .card-brand span { display: block; margin-top: 3px; color: #8492a2; font-size: 9px; letter-spacing: 0.07em; }
+      .auth-card h2 { margin: 0 0 7px; font-size: 25px; text-align: center; }
+      .card-copy { margin: 0 0 22px; color: #788698; font-size: 13px; line-height: 1.6; text-align: center; }
+      .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; margin-bottom: 22px; border-radius: 10px; background: #eef3f8; }
+      .tab { min-height: 40px; color: #69798b; font-family: inherit; font-size: 14px; font-weight: 800; border: 0; border-radius: 7px; background: transparent; cursor: pointer; }
+      .tab.active { color: #fff; background: var(--navy); box-shadow: 0 7px 18px rgba(5, 41, 80, 0.17); }
+      .auth-form { display: grid; gap: 16px; }
+      .auth-form.hidden, .account-view.hidden { display: none; }
+      label span { display: block; margin-bottom: 7px; color: #40536a; font-size: 13px; font-weight: 700; }
+      input {
+        width: 100%;
+        height: 48px;
+        padding: 0 13px;
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 14px;
+        border: 1px solid #cedae6;
+        border-radius: 8px;
+        outline: none;
+        background: #f9fbfd;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+      input:focus { border-color: #5d9ed8; box-shadow: 0 0 0 3px rgba(18, 105, 189, 0.11); }
+      .password-note { margin: -7px 0 0; color: #8a97a7; font-size: 11px; }
+      .submit-button, .logout-button {
+        min-height: 48px;
+        color: #fff;
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 800;
+        border: 0;
+        border-radius: 9px;
+        background: linear-gradient(100deg, #06315f, #1269bd);
+        box-shadow: 0 12px 24px rgba(7, 54, 104, 0.18);
+        cursor: pointer;
+      }
+      .submit-button:disabled, .logout-button:disabled { opacity: 0.6; cursor: wait; }
+      .message { margin-bottom: 18px; padding: 12px 13px; font-size: 12px; line-height: 1.55; border-radius: 8px; }
+      .message.hidden { display: none; }
+      .message.error { color: var(--error); border: 1px solid #f2c7c2; background: #fff2f0; }
+      .message.success { color: var(--success); border: 1px solid #bfe3d5; background: #effaf6; }
+      .service-notice { margin-bottom: 18px; padding: 12px 13px; color: #805b13; font-size: 12px; line-height: 1.55; border: 1px solid #ecd59d; border-radius: 8px; background: #fff9e9; }
+      .service-notice.hidden { display: none; }
+      .account-view { display: grid; gap: 18px; }
+      .account-avatar { width: 58px; height: 58px; display: grid; place-items: center; color: #fff; font-size: 23px; font-weight: 900; border-radius: 17px; background: linear-gradient(145deg, #23b9ee, #0d58ad); }
+      .account-name { margin: 0; font-size: 23px; }
+      .account-email { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+      .account-detail { padding: 14px; border-radius: 10px; background: #f2f6fa; }
+      .account-detail span { display: block; color: #8996a5; font-size: 11px; }
+      .account-detail strong { display: block; margin-top: 5px; font-size: 13px; }
+      .account-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .account-actions a { min-height: 46px; display: grid; place-items: center; color: #315b85; font-size: 13px; font-weight: 800; text-decoration: none; border: 1px solid #d2dfeb; border-radius: 8px; }
+      .logout-button { min-height: 46px; color: #8b2d25; border: 1px solid #efcbc7; background: #fff5f4; box-shadow: none; }
+
+      @media (max-width: 850px) {
+        .auth-shell { padding-top: 92px; }
+      }
+      @media (max-width: 560px) {
+        .header-inner { width: calc(100% - 28px); }
+        .brand-copy span { display: none; }
+        .home-link { padding: 9px 12px; }
+        .auth-shell { padding: 86px 14px 24px; }
+        .auth-card { padding: 26px 22px; border-radius: 17px; }
+        .account-actions { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="/">
+          <img src="/static/assets/nephonon-mark.svg" alt="科研智能计算平台 Logo" />
+          <span class="brand-copy"><strong>科研智能计算平台</strong><span>SCIENTIFIC INTELLIGENCE PLATFORM</span></span>
+        </a>
+        <div class="header-actions">
+          <div class="language" aria-label="语言">
+            <button type="button" data-language-switch="zh" aria-pressed="true">中</button>
+            <span aria-hidden="true">/</span>
+            <button type="button" data-language-switch="en" aria-pressed="false">EN</button>
+          </div>
+          <a class="home-link" href="/">返回首页</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="auth-shell">
+      <section class="auth-card">
+        <div class="card-brand" aria-label="科研智能计算平台">
+          <img src="/static/assets/nephonon-mark.svg" alt="" />
+          <div><strong>科研智能计算平台</strong><span>SCIENTIFIC INTELLIGENCE PLATFORM</span></div>
+        </div>
+        <div id="serviceNotice" class="service-notice hidden"></div>
+        <div id="message" class="message hidden" role="status"></div>
+
+        <div id="guestView">
+          <h2 id="formTitle">欢迎回来</h2>
+          <p id="formCopy" class="card-copy">登录科研智能计算平台。</p>
+          <div class="tabs" role="tablist" aria-label="账户操作">
+            <button id="loginTab" class="tab active" type="button" role="tab">登录</button>
+            <button id="registerTab" class="tab" type="button" role="tab">注册</button>
+          </div>
+
+          <form id="loginForm" class="auth-form">
+            <label><span>邮箱</span><input name="email" type="email" autocomplete="email" required maxlength="255" /></label>
+            <label><span>密码</span><input name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="128" /></label>
+            <button class="submit-button" type="submit">登录</button>
+          </form>
+
+          <form id="registerForm" class="auth-form hidden">
+            <label><span>显示名称</span><input name="displayName" type="text" autocomplete="name" required minlength="2" maxlength="40" /></label>
+            <label><span>邮箱</span><input name="email" type="email" autocomplete="email" required maxlength="255" /></label>
+            <label><span>密码</span><input name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" /></label>
+            <label><span>确认密码</span><input name="confirmPassword" type="password" autocomplete="new-password" required minlength="8" maxlength="128" /></label>
+            <p class="password-note">密码至少 8 个字符，最长 128 个字符。</p>
+            <button class="submit-button" type="submit">创建账户</button>
+          </form>
+        </div>
+
+        <div id="accountView" class="account-view hidden">
+          <div id="accountAvatar" class="account-avatar">U</div>
+          <div><h2 id="accountName" class="account-name"></h2><p id="accountEmail" class="account-email"></p></div>
+          <div class="account-detail"><span>账户创建时间</span><strong id="accountCreated">—</strong></div>
+          <div class="account-actions">
+            <a href="/modules">进入功能模块</a>
+            <button id="logoutButton" class="logout-button" type="button">退出登录</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/i18n.js"></script>
+    <script>
+      (function () {
+        var loginTab = document.getElementById("loginTab");
+        var registerTab = document.getElementById("registerTab");
+        var loginForm = document.getElementById("loginForm");
+        var registerForm = document.getElementById("registerForm");
+        var guestView = document.getElementById("guestView");
+        var accountView = document.getElementById("accountView");
+        var message = document.getElementById("message");
+        var serviceNotice = document.getElementById("serviceNotice");
+        var formTitle = document.getElementById("formTitle");
+        var formCopy = document.getElementById("formCopy");
+        var requestedMode = window.location.pathname === "/register" ? "register" : "login";
+        var nextValue = new URLSearchParams(window.location.search).get("next") || "/";
+        var nextUrl = nextValue.startsWith("/") && !nextValue.startsWith("//") ? nextValue : "/";
+
+        function tr(text) {
+          return window.PlatformI18n ? window.PlatformI18n.t(text) : text;
+        }
+
+        function showMessage(text, type) {
+          message.textContent = text;
+          message.className = "message " + (type || "error");
+        }
+
+        function clearMessage() {
+          message.textContent = "";
+          message.className = "message hidden";
+        }
+
+        function setMode(mode) {
+          clearMessage();
+          var register = mode === "register";
+          loginTab.classList.toggle("active", !register);
+          registerTab.classList.toggle("active", register);
+          loginForm.classList.toggle("hidden", register);
+          registerForm.classList.toggle("hidden", !register);
+          formTitle.textContent = tr(register ? "创建平台账户" : "欢迎回来");
+          formCopy.textContent = tr(register ? "注册后将自动登录。" : "登录科研智能计算平台。");
+          document.title = tr(register ? "注册账户｜科研智能计算平台" : "账户登录｜科研智能计算平台");
+        }
+
+        async function postJson(url, payload) {
+          var response = await fetch(url, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify(payload),
+          });
+          var result = await response.json().catch(function () { return {}; });
+          if (!response.ok) throw new Error(tr(result.error || "请求失败，请稍后再试。"));
+          return result;
+        }
+
+        function showAccount(user) {
+          guestView.classList.add("hidden");
+          accountView.classList.remove("hidden");
+          document.getElementById("accountName").textContent = user.displayName;
+          document.getElementById("accountEmail").textContent = user.email;
+          document.getElementById("accountAvatar").textContent = (user.displayName || "U").slice(0, 1).toUpperCase();
+          document.getElementById("accountCreated").textContent = user.createdAt ? new Date(user.createdAt).toLocaleString("zh-CN") : "—";
+          document.title = tr("我的账户｜科研智能计算平台");
+        }
+
+        loginTab.addEventListener("click", function () { setMode("login"); });
+        registerTab.addEventListener("click", function () { setMode("register"); });
+
+        loginForm.addEventListener("submit", async function (event) {
+          event.preventDefault();
+          clearMessage();
+          var button = loginForm.querySelector("button[type=submit]");
+          button.disabled = true;
+          try {
+            var form = new FormData(loginForm);
+            await postJson("/api/auth/login", { email: form.get("email"), password: form.get("password") });
+            window.location.href = nextUrl;
+          } catch (error) {
+            showMessage(error.message);
+          } finally {
+            button.disabled = false;
+          }
+        });
+
+        registerForm.addEventListener("submit", async function (event) {
+          event.preventDefault();
+          clearMessage();
+          var button = registerForm.querySelector("button[type=submit]");
+          var form = new FormData(registerForm);
+          if (form.get("password") !== form.get("confirmPassword")) {
+            showMessage(tr("两次输入的密码不一致。"));
+            return;
+          }
+          button.disabled = true;
+          try {
+            await postJson("/api/auth/register", {
+              displayName: form.get("displayName"),
+              email: form.get("email"),
+              password: form.get("password"),
+            });
+            window.location.href = nextUrl;
+          } catch (error) {
+            showMessage(error.message);
+          } finally {
+            button.disabled = false;
+          }
+        });
+
+        document.getElementById("logoutButton").addEventListener("click", async function () {
+          var button = this;
+          button.disabled = true;
+          try {
+            await postJson("/api/auth/logout", {});
+            window.location.href = "/";
+          } catch (error) {
+            showMessage(error.message);
+            button.disabled = false;
+          }
+        });
+
+        setMode(requestedMode);
+        fetch("/api/auth/status", { headers: { Accept: "application/json" } })
+          .then(function (response) { return response.json(); })
+          .then(function (result) {
+            if (!result.ok) {
+              serviceNotice.textContent = tr(result.error || "账户数据库尚未配置。");
+              serviceNotice.classList.remove("hidden");
+            }
+          })
+          .catch(function () {
+            serviceNotice.textContent = tr("账户数据库状态暂时无法读取。");
+            serviceNotice.classList.remove("hidden");
+          });
+        fetch("/api/auth/me", { credentials: "same-origin", headers: { Accept: "application/json" } })
+          .then(async function (response) {
+            var result = await response.json().catch(function () { return {}; });
+            if (!response.ok) {
+              serviceNotice.textContent = tr(result.error || "账户数据库尚未配置。");
+              serviceNotice.classList.remove("hidden");
+              return;
+            }
+            if (result.authenticated && result.user) showAccount(result.user);
+          })
+          .catch(function () {
+            serviceNotice.textContent = tr("账户服务暂时无法连接。");
+            serviceNotice.classList.remove("hidden");
+          });
+      })();
+    </script>
+  </body>
+</html>
