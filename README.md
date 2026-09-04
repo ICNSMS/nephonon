@@ -198,7 +198,7 @@ cd example\Copper
 ## How to Cite
 
 If you use **nephonon** in your research, please cite:
-> NEPHONON: An Efficient Phonon Calculator Based on Neuroevolution Potentials, Peng-Fei Liu, Jianbo Zhu, Xi Chen, Jingyu Li, Yongsheng Zhang*, and Junrong Zhang*, Comput. Phys. Commun.  **328**, 110344 (2026). [https://10.1016/j.cpc.2026.110344](https://doi.org/10.1016/j.cpc.2026.110344)
+NEPHONON: An Efficient Phonon Calculator Based on Neuroevolution Potentials, Peng-Fei Liu, Jianbo Zhu, Xi Chen, Jingyu Li, Yongsheng Zhang*, and Junrong Zhang*, Comput. Phys. Commun.  **328**, 110344 (2026). [https://10.1016/j.cpc.2026.110344](https://doi.org/10.1016/j.cpc.2026.110344)
 
 ## Contribution Guide
 
