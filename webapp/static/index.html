@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>科研智能计算平台｜计算工作区</title>
+    <link rel="icon" type="image/svg+xml" href="/static/assets/nephonon-mark.svg" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260829-agent-composer" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-mark" src="/static/assets/nephonon-mark.svg" alt="科研智能计算平台 Logo" />
+        <div>
+          <strong>科研智能计算平台</strong>
+          <span>Scientific Intelligence Platform</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <a href="/login" data-auth-entry class="home-link">登录</a>
+        <a href="/" class="home-link" target="_blank" rel="noopener">Home</a>
+        <span id="serverStatus" class="status-dot idle"></span>
+        <span id="statusText">Ready</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="left-rail">
+        <section class="panel">
+          <div class="panel-title">
+            <span id="importTitle">Import Calculation</span>
+            <button class="mini-button" type="button" data-collapse="importPanel">^</button>
+          </div>
+          <div id="importPanel" class="panel-body">
+            <div id="plotImportControls">
+              <label>
+                <span>Mode</span>
+                <select id="sourceMode">
+                  <option value="builder">Parameter Form</option>
+                  <option value="example">Example</option>
+                  <option value="upload">File</option>
+                </select>
+              </label>
+
+              <label id="exampleWrap">
+                <span>Example</span>
+                <select id="exampleSelect">
+                  <option value="pbte_band_dos">PbTe band + DOS</option>
+                  <option value="zno_band">ZnO phonon band</option>
+                  <option value="csi_sqw">CsI S(Q,E)</option>
+                  <option value="graphene_surface">Graphene band + surface</option>
+                  <option value="nacl_sqw">NaCl S(Q,E)</option>
+                </select>
+              </label>
+
+              <div id="uploadWrap" class="upload-grid hidden">
+                <label class="drop-field">
+                  <span>CIF structure <small>(optional, auto-fills crystal params)</small></span>
+                  <input id="plotCifFile" name="cif" type="file" accept=".cif,.mcif,text/plain" />
+                </label>
+                <label id="plotControlDrop" class="drop-field">
+                  <span>inp.control <small>(or use parameter form)</small></span>
+                  <input id="plotControlFile" name="control" type="file" />
+                </label>
+                <label class="drop-field">
+                  <span>FORCE_CONSTANTS <small>(required for plots)</small></span>
+                  <input id="fcFile" name="force_constants" type="file" />
+                </label>
+                <label class="drop-field wide">
+                  <span>inp.lotosplitting <small>(optional, for LO-TO correction)</small></span>
+                  <input id="lotoFile" name="loto" type="file" />
+                </label>
+              </div>
+            </div>
+
+            <div id="forceConstantImportControls" class="hidden">
+              <div class="upload-grid force-grid">
+                <label class="drop-field">
+                  <span>CIF structure <small>(optional, auto-fills crystal params)</small></span>
+                  <input id="forceCifFile" name="cif" type="file" accept=".cif,.mcif,text/plain" />
+                </label>
+                <label id="forceControlDrop" class="drop-field">
+                  <span>inp.control <small>(or use parameter form)</small></span>
+                  <input id="forceControlFile" name="control" type="file" />
+                </label>
+                <label class="drop-field">
+                  <span>nep.txt <small>(required)</small></span>
+                  <input id="nepFile" name="nep" type="file" />
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="manual-run-dock" aria-label="Manual calculation controls">
+          <div class="manual-run-copy">
+            <strong>Manual calculation</strong>
+            <span>Run with the current input and parameters</span>
+          </div>
+          <button id="runButton" class="primary manual-run-button" type="button">
+            <span aria-hidden="true">&#9654;</span>
+            <span>Run</span>
+          </button>
+        </div>
+
+        <section class="panel">
+          <div class="panel-title">
+            <span>Crystal Structure</span>
+            <button class="mini-button" type="button" data-collapse="structurePanel">^</button>
+          </div>
+          <div id="structurePanel" class="panel-body builder-panel">
+            <div id="cifStatus" class="cif-status">No CIF structure loaded</div>
+
+            <div class="form-grid two">
+              <label>
+                <span>ntypes</span>
+                <input id="builderNtypes" data-builder-field="ntypes" type="number" min="1" value="2" />
+              </label>
+              <label>
+                <span>natoms</span>
+                <input id="builderNatoms" data-builder-field="natoms" type="number" min="1" value="2" />
+              </label>
+              <label>
+                <span>nsize</span>
+                <input id="builderNsize" data-builder-field="nsize" type="text" value="5 5 5" />
+              </label>
+              <label>
+                <span>nat</span>
+                <input id="builderNat" data-builder-field="nat" type="text" value="1 1" />
+              </label>
+              <label class="wide-field">
+                <span>elements</span>
+                <input id="builderElements" data-builder-field="elements" type="text" value="Pb Te" />
+              </label>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="panel folded">
+          <div class="panel-title">
+            <span>Calculation Parameters</span>
+            <button class="mini-button" type="button" data-collapse="builderPanel">v</button>
+          </div>
+          <div id="builderPanel" class="panel-body builder-panel hidden">
+            <div class="form-grid two">
+              <label>
+                <span>Displace_DELTA</span>
+                <input id="builderDisplaceDelta" data-builder-field="displace_delta" type="text" value="0.01" />
+              </label>
+              <label>
+                <span>Coordinate</span>
+                <select id="builderCoordinateMode" data-builder-field="coordinate_mode">
+                  <option value="Direct">Direct</option>
+                  <option value="Cartesian">Cartesian</option>
+                </select>
+              </label>
+            </div>
+
+            <div id="plotSwitches" class="switch-grid">
+              <label><input data-builder-field="dos" type="checkbox" checked /> DOS</label>
+              <label><input data-builder-field="band" type="checkbox" checked /> Band</label>
+              <label><input data-builder-field="isosurface" type="checkbox" /> Isosurface</label>
+              <label><input data-builder-field="sqw_crystal" type="checkbox" /> S(Q,E)</label>
+              <label><input data-builder-field="sqw_powder" type="checkbox" /> Powder</label>
+              <label><input data-builder-field="nonanalytic" type="checkbox" /> LO-TO</label>
+              <label><input data-builder-field="velocity" type="checkbox" /> Velocity</label>
+              <label><input data-builder-field="eigenvector" type="checkbox" /> Eigenvector</label>
+            </div>
+
+            <div class="switch-grid">
+              <label><input data-builder-field="fc_symmetry" type="checkbox" /> fc_symmetry</label>
+              <label id="lphaseWrap"><input data-builder-field="lphase" type="checkbox" checked /> lphase</label>
+            </div>
+
+            <div id="plotParameterGrid" class="form-grid two">
+              <label>
+                <span>DOS_SIGMA</span>
+                <input data-builder-field="dos_sigma" type="text" value="0.02" />
+              </label>
+              <label>
+                <span>DOS q-mesh</span>
+                <input data-builder-field="dos_qmesh" type="text" value="40 40 40" />
+              </label>
+              <label>
+                <span>dw_qmesh</span>
+                <input data-builder-field="dw_qmesh" type="text" value="10 10 10" />
+              </label>
+              <label>
+                <span>Temperature</span>
+                <input data-builder-field="temperature" type="text" value="30" />
+              </label>
+              <label>
+                <span>E min</span>
+                <input data-builder-field="e_min" type="text" value="0.0" />
+              </label>
+              <label>
+                <span>E max</span>
+                <input data-builder-field="e_max" type="text" value="40.0" />
+              </label>
+              <label>
+                <span>E bins</span>
+                <input data-builder-field="ne_bins" type="text" value="501" />
+              </label>
+              <label>
+                <span>Isosurface mesh</span>
+                <input data-builder-field="isosurface_qmesh" type="text" value="80 80 1" />
+              </label>
+              <label class="wide-field">
+                <span>E smearing</span>
+                <input data-builder-field="e_smearing" type="text" value="0.6 0.0 0.001 0.0 0.0" />
+              </label>
+            </div>
+
+            <label>
+              <span>LATTICE_PARAMETERS</span>
+              <textarea id="builderLattice" data-builder-field="lattice" class="builder-textarea" spellcheck="false"></textarea>
+            </label>
+            <label>
+              <span>ATOMIC_POSITIONS</span>
+              <textarea id="builderPositions" data-builder-field="positions" class="builder-textarea" spellcheck="false"></textarea>
+            </label>
+            <label id="bandsBuilderWrap">
+              <span>BANDS_STRUCTURE segments</span>
+              <textarea id="builderBandsStructure" data-builder-field="bands_structure" class="builder-textarea tall" spellcheck="false"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel folded">
+          <div class="panel-title">
+            <span>inp.control</span>
+            <button class="mini-button" type="button" data-collapse="controlPanel">v</button>
+          </div>
+          <div id="controlPanel" class="panel-body control-panel hidden">
+            <div class="editor-row">
+              <span id="controlSourceLabel">No control loaded</span>
+            </div>
+            <textarea id="controlEditor" class="control-editor" spellcheck="false" placeholder="inp.control content will appear here."></textarea>
+          </div>
+        </section>
+
+        <section class="panel hidden">
+          <div class="panel-title">
+            <span>Calculation Options</span>
+            <button class="mini-button" type="button" data-collapse="calcPanel">^</button>
+          </div>
+          <div id="calcPanel" class="panel-body compact">
+            <div class="option-line">
+              <span>Input</span>
+              <strong id="inputSummary">Example mode</strong>
+            </div>
+            <div id="renderOption" class="option-line">
+              <span>Render</span>
+              <strong>Auto</strong>
+            </div>
+            <div id="forceOutputOption" class="option-line hidden">
+              <span>Output</span>
+              <strong>FORCE_CONSTANTS</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel hidden">
+          <div class="panel-title">
+            <span>Output Options</span>
+            <button class="mini-button" type="button" data-collapse="scenePanel">v</button>
+          </div>
+          <div id="scenePanel" class="panel-body hidden">
+            <div class="option-line">
+              <span>Theme</span>
+              <strong>Lab</strong>
+            </div>
+          </div>
+        </section>
+
+      </aside>
+
+      <section class="center-stage">
+        <div class="module-bar hidden">
+          <div class="compound-name" id="compoundName">NEPHONON Calculation</div>
+        </div>
+
+        <section class="results">
+          <div class="bar-title result-title">
+            <span>Results</span>
+            <select id="cmapSelect" class="hidden">
+              <option value="turbo">Turbo</option>
+              <option value="Blues">Dynasor blue</option>
+              <option value="jet" selected>Jet</option>
+              <option value="viridis">Viridis</option>
+              <option value="magma">Magma</option>
+              <option value="plasma">Plasma</option>
+              <option value="cividis">Cividis</option>
+            </select>
+          </div>
+          <div id="imageGrid" class="image-grid">
+            <div class="empty-state">
+              <strong>No result images</strong>
+              <span>Run an example or upload files.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="console">
+          <div class="bar-title">Console</div>
+          <pre id="consoleLog">Waiting for calculation...</pre>
+        </section>
+      </section>
+
+      <aside class="right-rail">
+        <section class="panel tall">
+          <div class="panel-title">
+            <span>AI Modeling Agent</span>
+            <button class="mini-button" type="button">^</button>
+          </div>
+          <div id="agentConversation" class="agent-box" role="log" aria-live="polite">
+            <article class="agent-message system-message">
+              <span class="agent-message-role">System</span>
+              <p>NEPHONON Web initialized.</p>
+            </article>
+            <article class="agent-message assistant-message">
+              <span class="agent-message-role">Agent</span>
+              <p id="agentMessage">Standing by.</p>
+            </article>
+          </div>
+          <div class="agent-composer">
+            <div class="agent-status">
+              <span class="status-dot idle"></span>
+              <span id="jobStatus">No active job</span>
+            </div>
+            <div class="intent-wrap">
+              <textarea id="intentBox" rows="4" placeholder="Describe your modeling intent..."></textarea>
+              <span id="intentHint" class="intent-hint"></span>
+              <div class="agent-composer-toolbar">
+                <span>Shift+Enter &#25442;&#34892;</span>
+                <button id="agentSendButton" class="agent-send-button" type="button" aria-label="Send message">
+                  <span>&#21457;&#36865;</span>
+                  <span aria-hidden="true">&#8593;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel hidden">
+          <div class="panel-title">
+            <span>Plot Style</span>
+            <button class="mini-button" type="button" data-collapse="stylePanel">^</button>
+          </div>
+          <div id="stylePanel" class="panel-body style-panel">
+            <label>
+              <span>Target plot</span>
+              <select id="styleTarget" disabled>
+                <option value="">No S(Q,E) plot</option>
+              </select>
+            </label>
+
+            <div class="style-categories" aria-label="Plot style sections">
+              <button type="button" data-style-section="text">Text</button>
+              <button type="button" data-style-section="axes">Axes</button>
+              <button type="button" data-style-section="color">Color</button>
+              <button class="hidden" type="button" data-style-section="export">Export</button>
+            </div>
+
+            <section id="styleSectionText" class="style-section" data-section="text">
+              <h3>Text</h3>
+              <div class="form-grid two">
+                <label class="wide-field">
+                  <span>X-axis label</span>
+                  <input id="styleXlabel" type="text" />
+                </label>
+                <label class="wide-field">
+                  <span>Y-axis label</span>
+                  <input id="styleYlabel" type="text" />
+                </label>
+                <label class="wide-field">
+                  <span>Title</span>
+                  <input id="styleTitle" type="text" />
+                </label>
+                <label>
+                  <span>Font family</span>
+                  <select id="styleFontFamily">
+                    <option value="sans-serif">Sans-serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="monospace">Monospace</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Font size</span>
+                  <input id="styleFontSize" type="number" min="1" max="72" value="12" />
+                </label>
+                <label>
+                  <span>Font color</span>
+                  <input id="styleFontColor" type="color" value="#1f2937" />
+                </label>
+              </div>
+
+              <div class="switch-grid">
+                <label><input id="styleBold" type="checkbox" /> Bold</label>
+                <label><input id="styleItalic" type="checkbox" /> Italic</label>
+              </div>
+            </section>
+
+            <section id="styleSectionAxes" class="style-section" data-section="axes">
+              <h3>Axes</h3>
+              <div class="form-grid two">
+                <label>
+                  <span>X min</span>
+                  <input id="styleXmin" type="text" placeholder="auto" />
+                </label>
+                <label>
+                  <span>X max</span>
+                  <input id="styleXmax" type="text" placeholder="auto" />
+                </label>
+                <label>
+                  <span>Y min</span>
+                  <input id="styleYmin" type="text" placeholder="auto" />
+                </label>
+                <label>
+                  <span>Y max</span>
+                  <input id="styleYmax" type="text" placeholder="auto" />
+                </label>
+                <label>
+                  <span>Left tick label</span>
+                  <input id="styleQStart" type="text" placeholder="Q0" />
+                </label>
+                <label>
+                  <span>Right tick label</span>
+                  <input id="styleQEnd" type="text" placeholder="Q1" />
+                </label>
+              </div>
+            </section>
+
+            <section id="styleSectionColor" class="style-section" data-section="color">
+              <h3>Color</h3>
+              <div class="form-grid two">
+                <label>
+                  <span>Colormap</span>
+                  <select id="styleCmap"></select>
+                </label>
+                <label>
+                  <span>Scale</span>
+                  <select id="styleScale">
+                    <option value="linear" selected>Linear equal</option>
+                    <option value="power">Enhanced</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Color min</span>
+                  <input id="styleCmin" type="text" placeholder="auto" />
+                </label>
+                <label>
+                  <span>Color max</span>
+                  <input id="styleCmax" type="text" placeholder="auto" />
+                </label>
+                <label>
+                  <span>Gamma</span>
+                  <input id="styleGamma" type="text" placeholder="1" />
+                </label>
+                <label>
+                  <span>Line width</span>
+                  <input id="styleLineWidth" type="text" placeholder="0 = raw, larger = smoother" />
+                </label>
+              </div>
+            </section>
+
+            <section id="styleSectionExport" class="style-section hidden" data-section="export">
+              <h3>Export</h3>
+              <a id="styleSave" class="ghost-button export-link" href="#" download>Save image</a>
+            </section>
+
+            <button id="styleApply" class="ghost-button" type="button">Apply style</button>
+
+          </div>
+        </section>
+
+        <section class="panel hidden">
+          <div class="panel-title">
+            <span>Generated Files</span>
+            <button class="mini-button" type="button" data-collapse="filesPanel">^</button>
+          </div>
+          <div id="filesPanel" class="panel-body">
+            <div id="fileList" class="file-list">
+              <span class="muted">No files yet.</span>
+            </div>
+          </div>
+        </section>
+
+      </aside>
+    </main>
+
+    <div id="styleModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="styleModalTitle">
+      <div class="style-modal">
+        <header>
+          <strong id="styleModalTitle">Plot Style</strong>
+          <button id="styleModalClose" class="mini-button" type="button">×</button>
+        </header>
+        <div id="styleModalBody"></div>
+      </div>
+    </div>
+
+    <script src="/static/app.js?v=20260829-agent-composer"></script>
+    <script src="/static/i18n.js"></script>
+    <script src="/static/auth-state.js"></script>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+&basic
+     ntypes = 2
+     natoms = 2
+      nsize = 5 5 5
+/
+
+&inputph
+   elements = "Pb" "Te"
+        nat = 1 1
+   gen2ndfc = .false.
+        dos = .true.
+       band = .true.
+   velocity = .false.
+eigenvector = .false.
+fc_symmetry = .false.
+nonanalytic = .false.
+ isosurface = .false.
+sqw_crystal = .false.
+ sqw_powder = .false.
+/
+
+DOS_SIGMA
+0.08
+
+DENSITY_OF_STATES
+12 12 12
+
+BANDS_STRUCTURE
+4
+0.000 0.000 0.000  0.500 0.000 0.500 60
+0.500 0.000 0.500  0.625 0.250 0.625 60
+0.375 0.375 0.750  0.000 0.000 0.000 60
+0.000 0.000 0.000  0.500 0.500 0.500 60
+
+LATTICE_PARAMETERS
+0.0000000000 3.2708968787 3.2708968787
+3.2708968787 0.0000000000 3.2708968787
+3.2708968787 3.2708968787 0.0000000000
+
+ATOMIC_POSITIONS
+Direct
+0.500000000 0.500000000 0.500000000
+0.000000000 0.000000000 0.000000000

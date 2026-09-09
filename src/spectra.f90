@@ -29,12 +29,13 @@ Contains
 !   qspace(3, nqpt)                  - Q-points in Cartesian coordinates [1/Angstrom]
 !   q_directions(3, nqpt), optional  - Direction vectors for NAC near Gamma
 !   verbose, optional                - Enable progress output
+!   reciprocal_asr, optional         - Enforce the acoustic sum rule in reciprocal space
 ! Outputs:
 !   omegas(nqpt, nbands)             - Angular frequencies [THz]
 !   eigenvecs(nqpt, nbands, nbands)  - Eigenvectors (optional)
 !   velocities(nqpt, nbands, 3)      - Group velocities (optional)
 !===========================================================================
-  Subroutine dmsolver(qspace, omegas, eigenvecs, q_directions, velocities, verbose)
+  Subroutine dmsolver(qspace, omegas, eigenvecs, q_directions, velocities, verbose, reciprocal_asr)
 
     Use constants, Only: thz2amua3, eps5, iunit
     Use func, Only: phexp
@@ -50,10 +51,11 @@ Contains
     Real (Kind=8), Intent (Out), Optional :: velocities(:, :, :)
     Complex (Kind=8), Intent (Out), Optional :: eigenvecs(:, :, :)
     Logical, Intent (In), Optional :: verbose
+    Logical, Intent (In), Optional :: reciprocal_asr
 
 ! Number of q-points
     Integer (Kind=4) :: nqpt
-    Logical :: verb
+    Logical :: verb, apply_reciprocal_asr
 
 ! Mass matrix (sqrt(m_i * m_j) for mass-weighting)
     Real (Kind=8), Allocatable :: mm(:, :)
@@ -63,6 +65,8 @@ Contains
     Complex (Kind=8), Allocatable :: dyn_nac(:, :) ! Non-analytic correction matrix
     Complex (Kind=8), Allocatable :: ddyn_total(:, :, :) ! Derivative of dynamical matrix
     Complex (Kind=8), Allocatable :: ddyn_nac(:, :, :) ! Derivative of NAC matrix
+    Complex (Kind=8), Allocatable :: dyn_gamma(:, :) ! Gamma-point matrix used by reciprocal ASR
+    Complex (Kind=8), Allocatable :: dyn_asr(:, :) ! Q-independent reciprocal ASR correction
 
 ! Force constants
     Real (Kind=8), Allocatable :: fc_diel(:, :, :, :, :, :, :) ! Dielectric (long-range) force constants
@@ -76,6 +80,7 @@ Contains
     Integer (Kind=4) :: iatom1, iatom2 ! Indices for atoms
     Integer (Kind=4) :: ix1, iy1, iz1 ! Supercell indices for atom1
     Integer (Kind=4) :: ix2, iy2, iz2 ! Supercell indices for periodic images
+    Integer (Kind=4) :: imode, icart, acoustic_modes(3)
 
 ! Temporary variables
     Real (Kind=8) :: tmp1, tmp2, tmp3 ! Temporary scalars
@@ -88,6 +93,7 @@ Contains
     Real (Kind=8), Allocatable :: rr(:, :) ! Relative vectors for equal-distance points
     Complex (Kind=8) :: ztmp ! Temporary complex number
     Complex (Kind=8) :: star ! Sum of phase factors
+    Complex (Kind=8) :: translation_overlap
     Real (Kind=8) :: q_nac(3) ! q-vector for NAC
 
 ! q-point folding to first Brillouin zone
@@ -96,6 +102,7 @@ Contains
 ! LAPACK diagonalization arrays
     Real (Kind=8), Allocatable :: omega2(:) ! Eigenvalues (squared frequencies)
     Real (Kind=8), Allocatable :: rwork(:) ! Real work array for LAPACK
+    Real (Kind=8), Allocatable :: gamma_eigenvalues(:), acoustic_score(:)
     Complex (Kind=8), Allocatable :: work(:) ! Complex work array for LAPACK
     Integer (Kind=4) :: nwork = 1 ! Size of work array (will be adjusted)
 
@@ -124,6 +131,8 @@ Contains
     Else
       verb = .True.
     End If
+    apply_reciprocal_asr = .False.
+    If (present(reciprocal_asr)) apply_reciprocal_asr = reciprocal_asr
 
     Allocate (mm(natoms,natoms))
     Allocate (omega2(nbands))
@@ -153,9 +162,77 @@ Contains
     End If
     Allocate (work(nwork))
     Allocate (shortest(3,nqpt))
+    Allocate (dyn_asr(nbands,nbands))
+    dyn_asr = 0.D0
 
 ! Maximum possible equal-distance points: 5×5×5 = 125
     Allocate (qr(125))
+
+! Build the reciprocal-space acoustic-sum-rule correction once. Following
+! the reciprocal ASR used by Euphonic/CASTEP, the three translational modes
+! of the Gamma dynamical matrix are shifted to zero and the same low-rank
+! correction is applied at every Q point. This avoids changing the supplied
+! real-space force constants and removes small imaginary acoustic pockets
+! without flattening them onto E=0.
+    If (apply_reciprocal_asr) Then
+      Allocate (dyn_gamma(nbands,nbands))
+      Allocate (gamma_eigenvalues(nbands), acoustic_score(nbands))
+      dyn_gamma = 0.D0
+
+      Do iatom1 = 1, natoms
+        Do iatom2 = 1, natoms
+          Do ix1 = 1, nsize(1)
+            Do iy1 = 1, nsize(2)
+              Do iz1 = 1, nsize(3)
+                Do i = 1, 3
+                  Do j = 1, 3
+                    dyn_gamma(3*(iatom1-1)+i,3*(iatom2-1)+j) = &
+                        dyn_gamma(3*(iatom1-1)+i,3*(iatom2-1)+j) + &
+                        fc_short(iatom2,j,ix1,iy1,iz1,iatom1,i)
+                  End Do
+                End Do
+              End Do
+            End Do
+          End Do
+        End Do
+      End Do
+
+      Call zheev('V', 'U', nbands, dyn_gamma, nbands, gamma_eigenvalues, work, -1, rwork, i)
+      If (real(work(1))>nwork) Then
+        nwork = nint(2*real(work(1)))
+        Deallocate (work)
+        Allocate (work(nwork))
+      End If
+      Call zheev('V', 'U', nbands, dyn_gamma, nbands, gamma_eigenvalues, work, nwork, rwork, i)
+
+! Identify translations by their overlap with mass-weighted rigid motion;
+! they are not necessarily the three lowest eigenvalues in noisy FC data.
+      acoustic_score = 0.D0
+      Do imode = 1, nbands
+        Do icart = 1, 3
+          translation_overlap = 0.D0
+          Do iatom1 = 1, natoms
+            translation_overlap = translation_overlap + sqrt(masses2(iatom1))* &
+                dyn_gamma(3*(iatom1-1)+icart,imode)
+          End Do
+          acoustic_score(imode) = acoustic_score(imode) + abs(translation_overlap)**2
+        End Do
+      End Do
+
+      Do ip = 1, 3
+        acoustic_modes(ip) = maxloc(acoustic_score, dim=1)
+        acoustic_score(acoustic_modes(ip)) = -1.D0
+        imode = acoustic_modes(ip)
+        Do i = 1, nbands
+          Do j = 1, nbands
+            dyn_asr(i,j) = dyn_asr(i,j) - gamma_eigenvalues(imode)* &
+                dyn_gamma(i,imode)*conjg(dyn_gamma(j,imode))
+          End Do
+        End Do
+      End Do
+
+      Deallocate (dyn_gamma, gamma_eigenvalues, acoustic_score)
+    End If
 
 ! Fold q-points to first Brillouin zone for non-analytic correction
 ! This improves the behavior of LO-TO splitting by using the shortest
@@ -352,6 +429,8 @@ Contains
         End Do
       End Do
 
+      If (apply_reciprocal_asr) dyn_total = dyn_total + dyn_asr
+
 ! Diagonalize dynamical matrix to obtain phonon frequencies
 ! The dynamical matrix is Hermitian, so we use LAPACK zheev
 ! First call with lwork=-1 queries optimal work array size
@@ -397,7 +476,7 @@ Contains
     End Do
 
     Deallocate (mm, omega2, rwork, fc_diel, fc_total)
-    Deallocate (dyn_total, dyn_nac, work, shortest, qr)
+    Deallocate (dyn_total, dyn_nac, dyn_asr, work, shortest, qr)
     If (allocated(ddyn_total)) Deallocate (ddyn_total, ddyn_nac, rr)
 
   End Subroutine dmsolver

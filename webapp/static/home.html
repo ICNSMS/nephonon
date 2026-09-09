@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="科研智能计算平台，集成材料建模、结果可视化与迁移势垒分析等科研工具。" />
+    <title>科研智能计算平台</title>
+    <link rel="icon" type="image/svg+xml" href="/static/assets/nephonon-mark.svg" />
+    <style>
+      :root {
+        --ink: #08264a;
+        --muted: #657386;
+        --navy: #052950;
+        --blue: #1269bd;
+        --cyan: #28b9f2;
+        --line: #dfe7f1;
+        --shadow: 0 22px 55px rgba(10, 48, 89, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        min-width: 320px;
+        color: var(--ink);
+        background: #fff;
+        font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      }
+      a { color: inherit; }
+
+      .wrap {
+        width: min(1360px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        height: 84px;
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.96);
+        border-bottom: 1px solid rgba(222, 230, 240, 0.9);
+        box-shadow: 0 8px 30px rgba(7, 39, 74, 0.05);
+        backdrop-filter: blur(18px);
+      }
+
+      .header-inner {
+        height: 100%;
+        display: grid;
+        grid-template-columns: minmax(250px, 1fr) auto minmax(250px, 1fr);
+        align-items: center;
+        gap: 24px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 13px;
+        width: max-content;
+        text-decoration: none;
+      }
+      .brand-logo { width: 46px; height: 46px; flex: 0 0 auto; }
+      .brand-copy strong { display: block; font-size: 20px; line-height: 1.05; letter-spacing: 0.015em; }
+      .brand-copy span { display: block; margin-top: 5px; color: #718094; font-size: 11px; letter-spacing: 0.06em; }
+
+      .main-nav { height: 100%; display: flex; align-items: center; gap: 34px; }
+      .nav-item { position: relative; height: 100%; display: flex; align-items: center; }
+      .nav-link,
+      .nav-trigger {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        height: 100%;
+        padding: 0;
+        color: #5a6674;
+        font-size: 15px;
+        font-weight: 700;
+        font-family: inherit;
+        text-decoration: none;
+        white-space: nowrap;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        transition: color 0.18s ease;
+      }
+      .nav-link::after,
+      .nav-trigger::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 15px;
+        width: 0;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--blue);
+        transform: translateX(-50%);
+        transition: width 0.18s ease;
+      }
+      .nav-link:hover,
+      .nav-link.active,
+      .nav-trigger:hover,
+      .nav-item:focus-within .nav-trigger { color: var(--ink); }
+      .nav-link:hover::after,
+      .nav-link.active::after,
+      .nav-trigger:hover::after,
+      .nav-item:focus-within .nav-trigger::after { width: 20px; }
+      .nav-caret {
+        width: 7px;
+        height: 7px;
+        margin-top: -4px;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        transform: rotate(45deg);
+        transition: transform 0.18s ease;
+      }
+      .nav-item:hover .nav-caret,
+      .nav-item:focus-within .nav-caret { transform: translateY(3px) rotate(225deg); }
+      .nav-menu {
+        position: absolute;
+        top: calc(100% - 8px);
+        left: 50%;
+        min-width: 230px;
+        padding: 10px;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        border: 1px solid #dce6f1;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 18px 42px rgba(8, 38, 74, 0.16);
+        transform: translate(-50%, 8px);
+        transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+      }
+      .nav-menu::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 14px; }
+      .nav-item:hover .nav-menu,
+      .nav-item:focus-within .nav-menu {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translate(-50%, 0);
+      }
+      .nav-menu a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-height: 43px;
+        padding: 10px 12px;
+        color: #40536a;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: color 0.15s ease, background 0.15s ease;
+      }
+      .nav-menu a:hover,
+      .nav-menu a:focus { color: #075ba9; background: #eef6ff; outline: none; }
+      .nav-menu a::after { content: "→"; color: #9aabbd; }
+      .nav-menu .nav-menu-all { margin-bottom: 5px; color: #075ba9; background: #f1f7fd; }
+
+      .header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 22px; }
+      .language { display: flex; align-items: center; gap: 5px; color: #a1adba; white-space: nowrap; }
+      .language button { padding: 2px; color: #8a97a8; font: inherit; font-size: 13px; border: 0; background: transparent; cursor: pointer; }
+      .language button:hover, .language button.active { color: var(--ink); font-weight: 800; }
+      .workspace-button {
+        padding: 12px 24px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 800;
+        text-decoration: none;
+        border-radius: 8px;
+        background: var(--navy);
+        box-shadow: 0 10px 22px rgba(5, 41, 80, 0.16);
+        transition: transform 0.18s ease, background 0.18s ease;
+      }
+      .workspace-button:hover { background: #0a3b72; transform: translateY(-1px); }
+
+      .hero {
+        position: relative;
+        min-height: 510px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 76% 16%, rgba(38, 184, 242, 0.18), transparent 27%),
+          radial-gradient(circle at 19% 30%, rgba(56, 131, 210, 0.12), transparent 31%),
+          linear-gradient(120deg, #f7faff 0%, #eef5fc 52%, #f8fbff 100%);
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.34;
+        background-image: radial-gradient(#7fa7cd 1px, transparent 1px);
+        background-size: 24px 24px;
+        mask-image: linear-gradient(90deg, transparent, #000 30%, #000 75%, transparent);
+      }
+      .hero-inner {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.03fr) minmax(390px, 0.97fr);
+        gap: 70px;
+        align-items: center;
+        padding: 68px 0;
+      }
+      .hero-kicker {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 20px;
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .hero-kicker::before { content: ""; width: 28px; height: 2px; background: var(--cyan); }
+      .hero h1 { margin: 0; font-size: clamp(40px, 5vw, 66px); line-height: 1.08; letter-spacing: -0.045em; }
+      .hero h1 span { display: block; margin-top: 12px; color: var(--blue); }
+      .hero-text { max-width: 680px; margin: 24px 0 0; color: var(--muted); font-size: 17px; line-height: 1.85; }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+      .hero-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 158px;
+        padding: 15px 22px;
+        font-size: 15px;
+        font-weight: 800;
+        text-decoration: none;
+        border-radius: 9px;
+        transition: 0.18s ease;
+      }
+      .hero-action.primary { color: #fff; background: var(--navy); box-shadow: 0 14px 30px rgba(5, 41, 80, 0.2); }
+      .hero-action.secondary { border: 1px solid #cfdbe9; background: rgba(255, 255, 255, 0.78); }
+      .hero-action:hover { transform: translateY(-2px); }
+
+      .science-visual {
+        position: relative;
+        min-height: 330px;
+        border: 1px solid rgba(150, 177, 207, 0.45);
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .science-visual::before {
+        content: "";
+        position: absolute;
+        inset: 30px;
+        border-radius: 20px;
+        background:
+          linear-gradient(rgba(17, 105, 189, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(17, 105, 189, 0.08) 1px, transparent 1px);
+        background-size: 28px 28px;
+      }
+      .phonon-wave {
+        position: absolute;
+        left: 30px;
+        right: 30px;
+        top: 52px;
+        height: 172px;
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .phonon-wave i {
+        width: 9%;
+        border-radius: 999px 999px 3px 3px;
+        background: linear-gradient(to top, #0c4f9b, #23b9ee 64%, #8eeaff);
+        box-shadow: 0 12px 18px rgba(19, 129, 199, 0.18);
+      }
+      .phonon-wave i:nth-child(1) { height: 28%; opacity: 0.55; }
+      .phonon-wave i:nth-child(2) { height: 52%; opacity: 0.72; }
+      .phonon-wave i:nth-child(3) { height: 86%; }
+      .phonon-wave i:nth-child(4) { height: 45%; opacity: 0.68; }
+      .phonon-wave i:nth-child(5) { height: 72%; opacity: 0.9; }
+      .phonon-wave i:nth-child(6) { height: 96%; }
+      .phonon-wave i:nth-child(7) { height: 61%; opacity: 0.78; }
+      .phonon-wave i:nth-child(8) { height: 38%; opacity: 0.58; }
+      .visual-label {
+        position: absolute;
+        left: 30px;
+        right: 30px;
+        bottom: 27px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 17px 20px;
+        color: #fff;
+        border-radius: 14px;
+        background: linear-gradient(105deg, #062a54, #0f66b6);
+      }
+      .visual-label strong { display: block; font-size: 15px; }
+      .visual-label span { display: block; margin-top: 4px; color: #cfe9ff; font-size: 12px; }
+      .live-dot { width: 11px; height: 11px; flex: 0 0 auto; border-radius: 50%; background: #43e2a0; box-shadow: 0 0 0 7px rgba(67, 226, 160, 0.13); }
+
+      .modules { padding: 70px 0 82px; }
+      .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 30px; }
+      .section-heading p { margin: 0 0 8px; color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: 0.16em; text-transform: uppercase; }
+      .section-heading h2 { margin: 0; font-size: 32px; letter-spacing: -0.025em; }
+      .more-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 15px;
+        color: #315b85;
+        font-size: 14px;
+        font-weight: 800;
+        text-decoration: none;
+        border: 1px solid #d6e2ee;
+        border-radius: 8px;
+        background: #fff;
+        transition: color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+      }
+      .more-link::after { content: "→"; }
+      .more-link:hover { color: #075ba9; border-color: #9fc4e6; transform: translateX(2px); }
+      .module-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+      .module-card {
+        position: relative;
+        min-height: 280px;
+        display: flex;
+        flex-direction: column;
+        padding: 29px;
+        text-decoration: none;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 14px 38px rgba(11, 49, 88, 0.07);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+      .module-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: linear-gradient(#20baf2, #125cb8);
+        transform: scaleY(0);
+        transform-origin: bottom;
+        transition: transform 0.2s ease;
+      }
+      .module-card:hover { border-color: #b9d4ee; box-shadow: 0 24px 50px rgba(9, 49, 90, 0.13); transform: translateY(-5px); }
+      .module-card:hover::before { transform: scaleY(1); }
+      .card-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+      .module-icon {
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        color: var(--navy);
+        font-size: 14px;
+        font-weight: 900;
+        border-radius: 10px;
+        background: #f2f6fb;
+        box-shadow: inset 0 0 0 1px #e6edf5;
+      }
+      .module-number { color: #c5d0dc; font-size: 13px; font-weight: 900; letter-spacing: 0.12em; }
+      .module-card h3 { margin: 28px 0 12px; font-size: 24px; letter-spacing: -0.02em; }
+      .module-card p { margin: 0; color: #697789; font-size: 14px; line-height: 1.75; }
+      .card-link { margin-top: auto; padding-top: 28px; color: #42607e; font-size: 14px; font-weight: 800; }
+      .card-link::after { content: "→"; display: inline-block; margin-left: 10px; transition: transform 0.18s ease; }
+      .module-card:hover .card-link::after { transform: translateX(4px); }
+
+      .site-footer { color: #d7e4f1; background: #070b11; }
+      .footer-inner { display: grid; grid-template-columns: minmax(270px, 0.9fr) minmax(400px, 1.1fr); gap: 80px; padding: 54px 0 42px; }
+      .footer-brand { display: flex; align-items: center; gap: 13px; }
+      .footer-brand img { width: 44px; height: 44px; }
+      .footer-brand strong { display: block; color: #fff; font-size: 20px; }
+      .footer-brand span { display: block; margin-top: 5px; color: #75879a; font-size: 11px; }
+      .footer-description { max-width: 430px; margin: 20px 0 0; color: #8593a3; font-size: 13px; line-height: 1.8; }
+      .partner-title { margin: 0 0 18px; color: #fff; font-size: 16px; }
+      .partner-logos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+      .partner-logo {
+        min-height: 82px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 20px;
+        border: 1px solid #273445;
+        border-radius: 11px;
+        background: #111822;
+        transition: border-color 0.18s ease, background 0.18s ease;
+      }
+      .partner-logo:hover { border-color: #3c5c7f; background: #151f2b; }
+      .partner-logo img { display: block; width: 100%; max-width: 330px; max-height: 56px; object-fit: contain; }
+      .partner-logo.ecut img { max-width: 250px; }
+      .footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 0 24px; color: #667586; font-size: 12px; border-top: 1px solid #1d2632; }
+      .footer-links { display: flex; gap: 22px; }
+      .footer-links a { color: #7f8fa1; text-decoration: none; }
+
+      @media (max-width: 1050px) {
+        .header-inner { grid-template-columns: 1fr auto; }
+        .main-nav { display: none; }
+        .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+        .science-visual { min-height: 300px; }
+        .module-grid { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 720px) {
+        .site-header { height: 72px; }
+        .wrap { width: min(100% - 30px, 1360px); }
+        .brand-logo { width: 39px; height: 39px; }
+        .brand-copy strong { font-size: 17px; }
+        .brand-copy span, .language { display: none; }
+        .workspace-button { padding: 10px 14px; font-size: 12px; }
+        .hero { min-height: auto; }
+        .hero-inner { padding: 48px 0; }
+        .hero h1 { font-size: 39px; }
+        .science-visual { min-height: 270px; }
+        .section-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+        .footer-inner { grid-template-columns: 1fr; gap: 34px; }
+        .partner-logos { grid-template-columns: 1fr; }
+        .footer-bottom { align-items: flex-start; flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner wrap">
+        <a class="brand" href="/" aria-label="科研智能计算平台首页">
+          <img class="brand-logo" src="/static/assets/nephonon-mark.svg" alt="科研智能计算平台 Logo" />
+          <span class="brand-copy">
+            <strong>科研智能计算平台</strong>
+            <span>SCIENTIFIC INTELLIGENCE PLATFORM</span>
+          </span>
+        </a>
+        <nav class="main-nav" aria-label="平台导航">
+          <a class="nav-link active" href="/">首页</a>
+          <div class="nav-item">
+            <button class="nav-trigger" type="button" aria-haspopup="true">
+              功能<span class="nav-caret" aria-hidden="true"></span>
+            </button>
+            <div class="nav-menu" role="menu" aria-label="功能模块">
+              <a class="nav-menu-all" href="/modules" role="menuitem">全部模块</a>
+              <a href="/plots" role="menuitem" data-auth-required>声子结果可视化</a>
+              <a href="/force" role="menuitem" data-auth-required>生成力常数</a>
+              <a id="fasttrackNepTopEntry" href="/fasttrack/" role="menuitem" data-auth-required data-auth-next="/fasttrack/">FastTrack-NEP</a>
+            </div>
+          </div>
+          <div class="nav-item">
+            <button class="nav-trigger" type="button" aria-haspopup="true">
+              合作单位<span class="nav-caret" aria-hidden="true"></span>
+            </button>
+            <div class="nav-menu" role="menu" aria-label="合作单位">
+              <a href="https://csns.ihep.cas.cn/" target="_blank" rel="noreferrer" role="menuitem">散裂中子源科学中心</a>
+              <a href="https://www.ecut.edu.cn/main.htm" target="_blank" rel="noreferrer" role="menuitem">东华理工大学</a>
+            </div>
+          </div>
+        </nav>
+        <div class="header-actions">
+          <div class="language" aria-label="语言">
+            <button type="button" data-language-switch="zh" aria-pressed="true">中</button>
+            <span aria-hidden="true">/</span>
+            <button type="button" data-language-switch="en" aria-pressed="false">EN</button>
+          </div>
+          <a class="workspace-button" data-auth-entry href="/login">登录</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="homeTitle">
+        <div class="hero-inner wrap">
+          <div>
+            <p class="hero-kicker">Scientific Intelligence Platform</p>
+            <h1 id="homeTitle">面向科学计算的<span>一体化智能科研平台</span></h1>
+            <p class="hero-text">
+              集成 NEPHONON 结果可视化、力常数生成与 FastTrack-NEP 迁移势垒分析。
+              各模块保持独立运行，通过统一入口连接科研工作流，并为后续智能工具持续扩展。
+            </p>
+            <div class="hero-actions">
+              <a class="hero-action primary" href="/modules">查看功能模块</a>
+            </div>
+          </div>
+          <div class="science-visual" aria-label="声子计算数据示意图">
+            <div class="phonon-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="visual-label">
+              <div><strong>Scientific Intelligence Platform</strong><span>Independent modules · Unified navigation</span></div>
+              <i class="live-dot" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="modules" id="modules" aria-labelledby="modulesTitle">
+        <div class="modules-inner wrap">
+          <div class="section-heading">
+            <div><p>Platform Functions</p><h2 id="modulesTitle">科研计算功能</h2></div>
+            <a class="more-link" href="/modules">更多</a>
+          </div>
+          <div class="module-grid">
+            <a class="module-card" href="/plots" data-auth-required>
+              <div class="card-head"><span class="module-icon">SQE</span><span class="module-number">01</span></div>
+              <h3>声子结果可视化</h3>
+              <p>生成能带、DOS、等频面与 S(Q,E) 等结果图，并支持图像样式调整和下载。</p>
+              <span class="card-link">进入 Plot Workspace</span>
+            </a>
+            <a class="module-card" href="/force" data-auth-required>
+              <div class="card-head"><span class="module-icon">FC</span><span class="module-number">02</span></div>
+              <h3>生成力常数</h3>
+              <p>上传 CIF 与 NEP 模型文件，调用本地流程生成后续声子计算所需的 FORCE_CONSTANTS。</p>
+              <span class="card-link">进入 FORCE_CONSTANTS</span>
+            </a>
+            <a class="module-card" id="fasttrackNepEntry" href="/fasttrack/" data-dev-href="http://127.0.0.1:5173/" data-prod-href="/fasttrack/" data-auth-required data-auth-next="/fasttrack/">
+              <div class="card-head"><span class="module-icon">FT</span><span class="module-number">03</span></div>
+              <h3>FastTrack-NEP</h3>
+              <p>进入独立的迁移势垒计算工作区，完成结构输入、势函数选择、任务执行与结果查看。</p>
+              <span class="card-link">进入迁移势垒分析</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="partners">
+      <div class="footer-inner wrap">
+        <section>
+          <div class="footer-brand">
+            <img src="/static/assets/nephonon-mark.svg" alt="" />
+            <div><strong>科研智能计算平台</strong><span>SCIENTIFIC INTELLIGENCE PLATFORM</span></div>
+          </div>
+          <p class="footer-description">面向声子计算、动力学结构因子可视化与原子迁移势垒分析的科研工具平台。</p>
+        </section>
+        <section aria-labelledby="partnerTitle">
+          <h2 class="partner-title" id="partnerTitle">合作与支持单位</h2>
+          <div class="partner-logos">
+            <a class="partner-logo" href="https://csns.ihep.cas.cn/" target="_blank" rel="noreferrer" aria-label="散裂中子源科学中心">
+              <img src="/static/assets/partners/csns.png" alt="散裂中子源科学中心" />
+            </a>
+            <a class="partner-logo ecut" href="https://www.ecut.edu.cn/main.htm" target="_blank" rel="noreferrer" aria-label="东华理工大学">
+              <img src="/static/assets/partners/ecut.png" alt="东华理工大学" />
+            </a>
+          </div>
+        </section>
+      </div>
+      <div class="footer-bottom wrap">
+        <span>Copyright © 2026 科研智能计算平台. All Rights Reserved.</span>
+        <nav class="footer-links" aria-label="页脚导航"><a href="/">首页</a><a href="/modules">功能</a><a href="#partners">合作单位</a></nav>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var localHosts = new Set(["127.0.0.1", "localhost", "::1"]);
+        var href = localHosts.has(window.location.hostname) ? "http://127.0.0.1:5173/" : "/fasttrack/";
+        ["fasttrackNepEntry", "fasttrackNepTopEntry"].forEach(function (id) {
+          var entry = document.getElementById(id);
+          if (entry) entry.href = href;
+        });
+      })();
+    </script>
+    <script src="/static/i18n.js"></script>
+    <script src="/static/auth-state.js"></script>
+  </body>
+</html>

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="科研智能计算平台全部功能模块。" />
+    <title>功能模块｜科研智能计算平台</title>
+    <link rel="icon" type="image/svg+xml" href="/static/assets/nephonon-mark.svg" />
+    <style>
+      :root {
+        --ink: #08264a;
+        --muted: #68778a;
+        --navy: #052950;
+        --blue: #1269bd;
+        --cyan: #28b9f2;
+        --line: #dfe7f1;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-width: 320px;
+        color: var(--ink);
+        background: #f5f8fc;
+        font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      }
+      .wrap { width: min(1260px, calc(100% - 48px)); margin: 0 auto; }
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        height: 84px;
+        background: rgba(255, 255, 255, 0.97);
+        border-bottom: 1px solid #e1e8f0;
+        box-shadow: 0 8px 30px rgba(7, 39, 74, 0.05);
+        backdrop-filter: blur(18px);
+      }
+      .header-inner {
+        height: 100%;
+        display: grid;
+        grid-template-columns: minmax(270px, 1fr) auto minmax(160px, 1fr);
+        align-items: center;
+        gap: 24px;
+      }
+      .brand { display: inline-flex; align-items: center; gap: 13px; width: max-content; color: inherit; text-decoration: none; }
+      .brand img { width: 46px; height: 46px; }
+      .brand-copy strong { display: block; font-size: 20px; line-height: 1.05; }
+      .brand-copy span { display: block; margin-top: 5px; color: #718094; font-size: 11px; letter-spacing: 0.06em; }
+      .main-nav { height: 100%; display: flex; align-items: center; gap: 34px; }
+      .nav-item { position: relative; height: 100%; display: flex; align-items: center; }
+      .nav-link, .nav-trigger {
+        position: relative;
+        height: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0;
+        color: #5a6674;
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+      .nav-link::after, .nav-trigger::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 15px;
+        width: 0;
+        height: 2px;
+        background: var(--blue);
+        transform: translateX(-50%);
+        transition: width 0.18s ease;
+      }
+      .nav-link:hover, .nav-trigger:hover, .nav-trigger.active, .nav-item:focus-within .nav-trigger { color: var(--ink); }
+      .nav-link:hover::after, .nav-trigger:hover::after, .nav-trigger.active::after, .nav-item:focus-within .nav-trigger::after { width: 20px; }
+      .nav-caret { width: 7px; height: 7px; margin-top: -4px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); }
+      .nav-menu {
+        position: absolute;
+        top: calc(100% - 8px);
+        left: 50%;
+        min-width: 230px;
+        padding: 10px;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        border: 1px solid #dce6f1;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 18px 42px rgba(8, 38, 74, 0.16);
+        transform: translate(-50%, 8px);
+        transition: 0.16s ease;
+      }
+      .nav-menu::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 14px; }
+      .nav-item:hover .nav-menu, .nav-item:focus-within .nav-menu { opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); }
+      .nav-menu a { display: flex; align-items: center; justify-content: space-between; min-height: 43px; padding: 10px 12px; color: #40536a; font-size: 14px; font-weight: 700; text-decoration: none; border-radius: 8px; }
+      .nav-menu a:hover, .nav-menu a:focus { color: #075ba9; background: #eef6ff; outline: none; }
+      .nav-menu a::after { content: "→"; color: #9aabbd; }
+      .header-page-actions { justify-self: end; display: flex; align-items: center; gap: 9px; }
+      .language { display: flex; align-items: center; gap: 5px; margin-right: 4px; color: #a1adba; white-space: nowrap; }
+      .language button { padding: 2px; color: #8a97a8; font: inherit; font-size: 13px; border: 0; background: transparent; cursor: pointer; }
+      .language button:hover, .language button.active { color: var(--ink); font-weight: 800; }
+      .header-login { padding: 10px 15px; color: #315b85; font-size: 13px; font-weight: 800; text-decoration: none; border: 1px solid #d5e1ec; border-radius: 8px; background: #fff; }
+      .header-home { padding: 11px 19px; color: #fff; font-size: 13px; font-weight: 800; text-decoration: none; border-radius: 8px; background: var(--navy); }
+
+      .page-hero {
+        position: relative;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 80% 20%, rgba(40, 185, 242, 0.16), transparent 25%),
+          linear-gradient(120deg, #f8fbff, #eaf3fc);
+        border-bottom: 1px solid #dce7f2;
+      }
+      .page-hero::before { content: ""; position: absolute; inset: 0; opacity: 0.35; background-image: radial-gradient(#7fa7cd 1px, transparent 1px); background-size: 24px 24px; }
+      .hero-inner { position: relative; padding: 72px 0 64px; }
+      .eyebrow { margin: 0 0 14px; color: var(--blue); font-size: 12px; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase; }
+      h1 { margin: 0; font-size: clamp(38px, 5vw, 58px); letter-spacing: -0.045em; }
+      .hero-copy { max-width: 720px; margin: 18px 0 0; color: var(--muted); font-size: 16px; line-height: 1.8; }
+
+      .module-section { padding: 54px 0 82px; }
+      .module-meta { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+      .module-meta strong { font-size: 20px; }
+      .module-meta span { color: #8190a2; font-size: 13px; }
+      .module-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+      .module-card {
+        min-height: 330px;
+        display: flex;
+        flex-direction: column;
+        padding: 28px;
+        color: inherit;
+        text-decoration: none;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 15px 38px rgba(11, 49, 88, 0.07);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+      .module-card:hover { border-color: #a9c9e8; box-shadow: 0 24px 52px rgba(9, 49, 90, 0.14); transform: translateY(-5px); }
+      .module-top { display: flex; align-items: center; justify-content: space-between; }
+      .module-icon { width: 52px; height: 52px; display: grid; place-items: center; color: #075ba9; font-size: 14px; font-weight: 900; border-radius: 12px; background: #edf6ff; }
+      .module-status { padding: 6px 9px; color: #247258; font-size: 11px; font-weight: 800; border-radius: 999px; background: #e9f8f1; }
+      .module-card h2 { margin: 27px 0 12px; font-size: 24px; }
+      .module-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
+      .module-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 20px; }
+      .module-tags span { padding: 5px 8px; color: #5c7087; font-size: 11px; border-radius: 5px; background: #f2f5f8; }
+      .module-enter { margin-top: auto; padding-top: 26px; color: #075ba9; font-size: 14px; font-weight: 900; }
+      .module-enter::after { content: "→"; margin-left: 9px; }
+      .site-footer { padding: 24px 0; color: #7d8b9a; font-size: 12px; background: #070b11; }
+      .footer-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+      .footer-row a { color: #9aabba; text-decoration: none; }
+
+      @media (max-width: 980px) {
+        .header-inner { grid-template-columns: 1fr auto; }
+        .main-nav { display: none; }
+        .module-list { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 640px) {
+        .wrap { width: min(100% - 30px, 1260px); }
+        .site-header { height: 72px; }
+        .brand img { width: 39px; height: 39px; }
+        .brand-copy strong { font-size: 17px; }
+        .brand-copy span { display: none; }
+        .header-home { padding: 9px 13px; }
+        .hero-inner { padding: 48px 0; }
+        .footer-row { align-items: flex-start; flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner wrap">
+        <a class="brand" href="/" aria-label="科研智能计算平台首页">
+          <img src="/static/assets/nephonon-mark.svg" alt="科研智能计算平台 Logo" />
+          <span class="brand-copy"><strong>科研智能计算平台</strong><span>SCIENTIFIC INTELLIGENCE PLATFORM</span></span>
+        </a>
+        <nav class="main-nav" aria-label="平台导航">
+          <a class="nav-link" href="/">首页</a>
+          <div class="nav-item">
+            <button class="nav-trigger active" type="button" aria-haspopup="true">功能<span class="nav-caret" aria-hidden="true"></span></button>
+            <div class="nav-menu" role="menu" aria-label="功能模块">
+              <a href="/modules" role="menuitem">全部模块</a>
+              <a href="/plots" role="menuitem" data-auth-required>声子结果可视化</a>
+              <a href="/force" role="menuitem" data-auth-required>生成力常数</a>
+              <a id="fasttrackNepTopEntry" href="/fasttrack/" role="menuitem" data-auth-required data-auth-next="/fasttrack/">FastTrack-NEP</a>
+            </div>
+          </div>
+          <div class="nav-item">
+            <button class="nav-trigger" type="button" aria-haspopup="true">合作单位<span class="nav-caret" aria-hidden="true"></span></button>
+            <div class="nav-menu" role="menu" aria-label="合作单位">
+              <a href="https://csns.ihep.cas.cn/" target="_blank" rel="noreferrer" role="menuitem">散裂中子源科学中心</a>
+              <a href="https://www.ecut.edu.cn/main.htm" target="_blank" rel="noreferrer" role="menuitem">东华理工大学</a>
+            </div>
+          </div>
+        </nav>
+        <div class="header-page-actions">
+          <div class="language" aria-label="语言">
+            <button type="button" data-language-switch="zh" aria-pressed="true">中</button>
+            <span aria-hidden="true">/</span>
+            <button type="button" data-language-switch="en" aria-pressed="false">EN</button>
+          </div>
+          <a class="header-login" data-auth-entry href="/login">登录</a>
+          <a class="header-home" href="/">返回首页</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="hero-inner wrap">
+          <p class="eyebrow">Platform Modules</p>
+          <h1>全部功能模块</h1>
+          <p class="hero-copy">集中展示当前已接入的科研计算工具。后续新增模块会继续加入此页面，并保持独立运行与统一入口。</p>
+        </div>
+      </section>
+
+      <section class="module-section">
+        <div class="wrap">
+          <div class="module-meta"><strong>当前可用</strong><span>共 3 个模块</span></div>
+          <div class="module-list">
+            <a class="module-card" href="/plots" data-auth-required>
+              <div class="module-top"><span class="module-icon">SQE</span><span class="module-status">可用</span></div>
+              <h2>声子结果可视化</h2>
+              <p>读取 NEPHONON 输出并生成能带、DOS、等频面与动力学结构因子 S(Q,E) 图像。</p>
+              <div class="module-tags"><span>NEPHONON</span><span>S(Q,E)</span><span>Visualization</span></div>
+              <span class="module-enter">进入模块</span>
+            </a>
+            <a class="module-card" href="/force" data-auth-required>
+              <div class="module-top"><span class="module-icon">FC</span><span class="module-status">可用</span></div>
+              <h2>生成力常数</h2>
+              <p>通过结构文件与 NEP 模型生成 FORCE_CONSTANTS，为后续声子计算准备输入数据。</p>
+              <div class="module-tags"><span>CIF</span><span>NEP</span><span>FORCE_CONSTANTS</span></div>
+              <span class="module-enter">进入模块</span>
+            </a>
+            <a class="module-card" id="fasttrackNepEntry" href="/fasttrack/" data-auth-required data-auth-next="/fasttrack/">
+              <div class="module-top"><span class="module-icon">FT</span><span class="module-status">可用</span></div>
+              <h2>FastTrack-NEP</h2>
+              <p>完成原子迁移势垒分析，包括结构输入、势函数选择、任务执行与计算结果查看。</p>
+              <div class="module-tags"><span>Migration</span><span>Barrier</span><span>NEP</span></div>
+              <span class="module-enter">进入模块</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-row wrap"><span>Copyright © 2026 科研智能计算平台</span><a href="/">返回平台首页</a></div>
+    </footer>
+    <script>
+      (function () {
+        var localHosts = new Set(["127.0.0.1", "localhost", "::1"]);
+        var href = localHosts.has(window.location.hostname) ? "http://127.0.0.1:5173/" : "/fasttrack/";
+        ["fasttrackNepEntry", "fasttrackNepTopEntry"].forEach(function (id) {
+          var entry = document.getElementById(id);
+          if (entry) entry.href = href;
+        });
+      })();
+    </script>
+    <script src="/static/i18n.js"></script>
+    <script src="/static/auth-state.js"></script>
+  </body>
+</html>
