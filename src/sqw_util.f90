@@ -51,7 +51,7 @@ Contains
     End Do
 
 ! Calculate phonon frequencies and eigenvectors
-    Call dmsolver(qzone, omegas, eigenvecs, verbose=.True.)
+    Call dmsolver(qzone, omegas, eigenvecs, verbose=.True., reciprocal_asr=.True.)
 
 ! MSD calculation
     Do ii = 1, natoms
@@ -75,7 +75,7 @@ Contains
 
 ! Calculate S(Q, E) at given Q-point
 ! Computes single-phonon emission contribution
-  Subroutine sqw_givenq(qpt, omegas, rmsd, eigenvecs, sqwtemp, t)
+  Subroutine sqw_givenq(qpt, omegas, rmsd, eigenvecs, sqwtemp, t, energy_floor)
     Use func, Only: fbemev
     Use constants, Only: iunit, eps3
     Use variables, Only: natoms, nbands, &
@@ -83,17 +83,20 @@ Contains
                          positions
     Implicit None
     Real (Kind=8), Intent (In) :: t, qpt(:), omegas(:), rmsd(:, :)
+    Real (Kind=8), Intent (In), Optional :: energy_floor
     Real (Kind=8), Intent (Out) :: sqwtemp(:)
     Complex (Kind=8), Intent (In) :: eigenvecs(:, :)
 
     Integer (Kind=4) :: ii, jj
-    Real (Kind=8) :: dwfac
+    Real (Kind=8) :: dwfac, omega_weight
     Complex (Kind=8) :: temp, tempsum
 
     sqwtemp = 0.D0
 
     Do ii = 1, nbands
       If (omegas(ii)<eps3) Cycle
+      omega_weight = omegas(ii)
+      If (present(energy_floor)) omega_weight = max(omega_weight, energy_floor)
       tempsum = 0.D0
       Do jj = 1, natoms
         dwfac = 0.5D0*dot_product(qpt, rmsd(:,jj))**2
@@ -107,7 +110,7 @@ Contains
         End If
         tempsum = tempsum + temp
       End Do
-      sqwtemp(ii) = abs(tempsum)**2*(fbemev(omegas(ii),t)+1.D0)/omegas(ii)
+      sqwtemp(ii) = abs(tempsum)**2*(fbemev(omega_weight,t)+1.D0)/omega_weight
     End Do
   End Subroutine sqw_givenq
 End Module sqw_util

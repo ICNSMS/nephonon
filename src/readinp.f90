@@ -138,7 +138,7 @@ Contains
     e_min = 0.D0
     e_max = 10.D0
     ne_bins = 1000
-    e_smearing = (/ 1.17741D0, 0.D0, 0.D0, 0.D0, 0.D0 /)
+    e_smearing = (/ 0.6D0, 0.D0, 0.001D0, 0.D0, 0.D0 /)
     q_smearing = 0.D0
     temperature = 300.D0
     dw_qmesh = (/ 20, 20, 20 /)

@@ -124,7 +124,7 @@ Contains
     Use output, Only: write_sqw_intensity
     Implicit None
     Integer (Kind=4) :: ih, ii, jj, nq
-    Real (Kind=8) :: ee(ne_bins), de, sig
+    Real (Kind=8) :: ee(ne_bins), de, sig, intensity_floor
     Real (Kind=8) :: sqwtemp(nbands)
 
     nq = nqtot ! Use the total number of Q points
@@ -140,12 +140,13 @@ Contains
       ee = e_min
       de = 0.D0
     End If
+    intensity_floor = max(0.35D0, 2.D0*abs(de))
 
     Write (*, '(a)') 'Calculate S(Q, E) ...'
 
     Do ih = 1, nq
 
-      Call sqw_givenq(cqlist(:,ih), omega(ih,:), armsd(:,:), eigenvec(ih,:,:), sqwtemp, temperature)
+      Call sqw_givenq(cqlist(:,ih), omega(ih,:), armsd(:,:), eigenvec(ih,:,:), sqwtemp, temperature, intensity_floor)
       Do jj = 1, nbands
         sig = gaussian_sigma_poly4(omega(ih,jj), e_smearing, de)
         Call add_gaussian_to_grid(sqwsum(:,ih), ee, omega(ih,jj), sig, sqwtemp(jj))
@@ -173,16 +174,15 @@ Contains
     omega = 0.D0
     eigenvec = 0.D0
 
-    Call dmsolver(cqlist(:,:), omega(:,:), eigenvec(:,:,:))
+    Call dmsolver(cqlist(:,:), omega(:,:), eigenvec(:,:,:), reciprocal_asr=.True.)
 
     omega = omega/tpi*thz2mev
 
-! Set all imaginary frequencies to zero
+! Keep genuine imaginary modes signed.  sqw_givenq excludes them from the
+! positive energy-loss map instead of collapsing a whole Q interval onto E=0.
     If (any(omega<-eps1)) Then
-      Write (*, '(a)') 'Warning: there exists imaginary frequency.'
+      Write (*, '(a)') 'Warning: imaginary frequencies are excluded from S(Q,E).'
       Write (*, *)
-      Where (omega<0.D0) omega = 0.D0
-      Where (omega<eps3) omega = omega + eps3
     End If
   End Subroutine phoneigen
 
@@ -227,7 +227,7 @@ Contains
     Integer (Kind=4) :: i_bin, i_dir, jj
     Real (Kind=8) :: q_mag, u, v, theta, phi
     Real (Kind=8) :: q_dir(3)
-    Real (Kind=8) :: ee(ne_bins), de, sig
+    Real (Kind=8) :: ee(ne_bins), de, sig, intensity_floor
     Real (Kind=8) :: sqwtemp(nbands)
 
 ! Allocate memory for Q-points batch (one shell)
@@ -267,6 +267,7 @@ Contains
       ee = e_min
       de = 0.D0
     End If
+    intensity_floor = max(0.35D0, 2.D0*abs(de))
 
     Write (*, '(a)') 'Start to compute powder spectra ...'
 
@@ -306,16 +307,17 @@ Contains
         End Do
       End If
 
-      Call dmsolver(q_shell, omega_shell, eigenvec_shell, verbose=.False.)
+      Call dmsolver(q_shell, omega_shell, eigenvec_shell, verbose=.False., reciprocal_asr=.True.)
 
 ! Post-process frequencies (convert to meV)
       omega_shell = omega_shell/tpi*thz2mev
-      Where (omega_shell<0.D0) omega_shell = 0.D0
-      Where (omega_shell<eps3) omega_shell = omega_shell + eps3
+      If (any(omega_shell<-eps1)) Then
+        Write (*, '(a,i0)') 'Warning: imaginary powder modes excluded in Q bin ', i_bin
+      End If
 
 ! Calculate S(Q,E) contribution
       Do i_dir = 1, npts_sphere
-        Call sqw_givenq(q_shell(:,i_dir), omega_shell(i_dir,:), armsd, eigenvec_shell(i_dir,:,:), sqwtemp, temperature)
+        Call sqw_givenq(q_shell(:,i_dir), omega_shell(i_dir,:), armsd, eigenvec_shell(i_dir,:,:), sqwtemp, temperature, intensity_floor)
 
 ! Accumulate into energy bins
         Do jj = 1, nbands

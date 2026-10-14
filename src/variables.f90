@@ -101,7 +101,7 @@ Module variables
   Logical :: lphase = .False. ! If .TRUE., include exp(i Q·r) phase factors in S(Q,E).
 
 ! Resolution function parameters
-  Real (Kind=8) :: e_smearing(5) = (/ 1.17741D0, 0.D0, 0.D0, 0.D0, 0.D0 /)
+  Real (Kind=8) :: e_smearing(5) = (/ 0.6D0, 0.D0, 0.001D0, 0.D0, 0.D0 /)
   Real (Kind=8) :: q_smearing(5) = 0.D0
 
 ! Powder calculation parameters
