@@ -203,6 +203,9 @@ NEPHONON: An Efficient Phonon Calculator Based on Neuroevolution Potentials, Pen
 
 We also recommend that you cite the relevant papers on neuroevolution potentials:
 
+K. Xu et al., GPUMD 4.0: A high‐performance molecular dynamics package for versatile materials simulations with machine‐learned potentials, Materials Genome Engineering Advances 3, e70028 (2025).
+
+T. Liang et al., NEP89: universal neuroevolution potential for inorganic and organic materials across 89 elements, Nat Comput Sci 6, 789 (2026).
 
 ## Contribution Guide
 
